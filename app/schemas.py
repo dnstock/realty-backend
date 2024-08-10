@@ -13,11 +13,12 @@ class ItemBase(BaseModel):
     description: str
 
 class ItemCreate(ItemBase):
-    pass
+    category_id: int
 
 class Item(ItemBase):
     id: int
     owner_id: int
+    category_id: int
 
     class Config:
         from_attributes = True
@@ -35,3 +36,17 @@ class User(UserBase):
 
     class Config:
         from_attributes = True
+
+class CategoryBase(BaseModel):
+    name: str
+    description: str
+
+class CategoryCreate(CategoryBase):
+    pass
+
+class Category(CategoryBase):
+    id: int
+    items: List[Item] = []
+
+    class Config:
+        from_attributes: True

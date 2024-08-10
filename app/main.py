@@ -45,11 +45,20 @@ def read_user(user_id: int, db: Session = Depends(database.get_db)):
 
 @app.post("/users/{user_id}/items/", response_model=schemas.Item)
 def create_item_for_user(
-    user_id: int, item: schemas.ItemCreate, db: Session = Depends(database.get_db)
+    user_id: int, item: schemas.ItemCreate, db: Session = Depends(database.get_db), current_user: schemas.User = Depends(auth.get_current_user)
 ):
     return crud.create_item(db=db, item=item, user_id=user_id)
 
 @app.get("/items/", response_model=List[schemas.Item])
-def read_items(skip: int = 0, limit: int = 10, db: Session = Depends(database.get_db)):
+def read_items(skip: int = 0, limit: int = 10, db: Session = Depends(database.get_db), current_user: schemas.User = Depends(auth.get_current_user)):
     items = crud.get_items(db, skip=skip, limit=limit)
     return items
+
+@app.post("/categories/", response_model=schemas.Category)
+def create_category(category: schemas.CategoryCreate, db: Session = Depends(database.get_db), current_user: schemas.User = Depends(auth.get_current_user)):
+    crud.create_category(db=db, category=category)
+
+@app.get("/categories/", response_model=List[schemas.Category])
+def read_categories(skip: int = 0, limit: int = 10, db: Session = Depends(database.get_db), current_user: schemas.User = Depends(auth.get_current_user)):
+    categories = crud.get_categories(db, skip=skip, limit=limit)
+    return categories    

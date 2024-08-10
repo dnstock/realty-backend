@@ -12,6 +12,15 @@ class User(Base):
 
     items = relationship("Item", back_populates="owner")
 
+class Category(Base):
+    __tablename__ = "categories"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)
+    description = Column(String, index=True)
+
+    items = relationship("Item", back_populates="category")
+
 class Item(Base):
     __tablename__ = "items"
 
@@ -19,5 +28,7 @@ class Item(Base):
     title = Column(String, index=True)
     description = Column(String, index=True)
     owner_id = Column(Integer, ForeignKey(User.id))
+    category_id = Column(Integer, ForeignKey(Category.id))
 
     owner = relationship("User", back_populates="items")
+    category = relationship("Category", back_populates="items")
