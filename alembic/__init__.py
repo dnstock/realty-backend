@@ -1,2 +1,2 @@
-# app/__init__.py
+# alembic/__init__.py
 # This file is intentionally left blank.
