@@ -26,10 +26,17 @@ from app.models import Base
 target_metadata = Base.metadata
 
 # Construct the DATABASE_URL
-database_user = os.getenv('DATABASE_USER')
-database_password = os.getenv('DATABASE_PASSWORD')
-database_name = os.getenv('DATABASE_NAME')
-database_host = os.getenv('DATABASE_HOST', 'localhost')
+def get_env_var(var_name):
+    value = os.getenv(var_name)
+    if not value:
+        raise EnvironmentError(f"Missing required environment variable: {var_name}")
+    return value
+
+database_user = get_env_var('DATABASE_USER')
+database_password = get_env_var('DATABASE_PASSWORD')
+database_name = get_env_var('DATABASE_NAME')
+database_host = os.getenv('DATABASE_HOST', 'localhost')  # Optional with default value
+
 database_url = f"postgresql://{database_user}:{database_password}@{database_host}/{database_name}"
 
 # other values from the config, defined by the needs of env.py,
