@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, Date
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -10,25 +10,71 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
 
-    items = relationship("Item", back_populates="owner")
+    properties = relationship("Property", back_populates="manager")
 
-class Category(Base):
-    __tablename__ = "categories"
+class Property(Base):
+    __tablename__ = "properties"
+
+    id = Column(Integer, primary_key=True, index=True)
+    address = Column(String, index=True)
+    city = Column(String, index=True)
+    state = Column(String, index=True)
+    zip_code = Column(String, index=True)
+    manager_id = Column(Integer, ForeignKey("users.id"))
+
+    manager = relationship("User", back_populates="properties")
+    buildings = relationship("Building", back_populates="property")
+
+class Building(Base):
+    __tablename__ = "buildings"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
-    description = Column(String, index=True)
+    property_id = Column(Integer, ForeignKey("properties.id"))
 
-    items = relationship("Item", back_populates="category")
+    property = relationship("Property", back_populates="buildings")
+    units = relationship("Unit", back_populates="building")
 
-class Item(Base):
-    __tablename__ = "items"
+class Unit(Base):
+    __tablename__ = "units"
 
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, index=True)
-    description = Column(String, index=True)
-    owner_id = Column(Integer, ForeignKey(User.id))
-    category_id = Column(Integer, ForeignKey(Category.id))
+    number = Column(String, index=True)
+    building_id = Column(Integer, ForeignKey("buildings.id"))
 
-    owner = relationship("User", back_populates="items")
-    category = relationship("Category", back_populates="items")
+    building = relationship("Building", back_populates="units")
+    leases = relationship("Lease", back_populates="unit")
+
+class Lease(Base):
+    __tablename__ = "leases"
+
+    id = Column(Integer, primary_key=True, index=True)
+    start_date = Column(Date)
+    end_date = Column(Date)
+    unit_id = Column(Integer, ForeignKey("units.id"))
+
+    unit = relationship("Unit", back_populates="leases")
+    tenants = relationship("Tenant", back_populates="lease")
+
+class Tenant(Base):
+    __tablename__ = "tenants"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)
+    email = Column(String, unique=True, index=True)
+    phone = Column(String, index=True)
+    lease_id = Column(Integer, ForeignKey("leases.id"))
+
+    lease = relationship("Lease", back_populates="tenants")
+    insurances = relationship("Insurance", back_populates="tenant")
+
+class Insurance(Base):
+    __tablename__ = "insurances"
+
+    id = Column(Integer, primary_key=True, index=True)
+    policy_number = Column(String, index=True)
+    expiration_date = Column(Date)
+    tenant_id = Column(Integer, ForeignKey("tenants.id"))
+
+    tenant = relationship("Tenant", back_populates="insurances")
+    

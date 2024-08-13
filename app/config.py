@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     secret_key: str
     algorithm: str
     access_token_expire_minutes: int
-    database_url: str
+    database_url: str = ''
     
     @classmethod
     def validate_env_vars(cls):
