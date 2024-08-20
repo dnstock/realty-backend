@@ -12,7 +12,8 @@ from app.models import Base
 from app.config import settings
 
 # Create the engine using the database URL
-engine = create_engine(settings.DATABASE_URL)
+engine = create_engine(settings.database_url)
 
 # Create all tables in the database
-Base.metadata.create_all(bind=engine)
+#(UNCOMMENT THE LINE BELOW BEFORE RUNNING THIS SCRIPT)
+#Base.metadata.create_all(bind=engine)

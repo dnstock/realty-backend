@@ -5,6 +5,9 @@
 # run application
 uvicorn app.main:app --reload
 
+# run tests
+pytest tests/somefile.py
+
 # =========================
 ## VIRTUAL ENVIRONMENT
 # =========================
