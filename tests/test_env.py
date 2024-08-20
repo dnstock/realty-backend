@@ -2,7 +2,7 @@ import os
 import pytest
 from dotenv import load_dotenv
 
-def test_load_env():
+def test_load_env_development():
     # Set environment to development for this test
     os.environ['ENVIRONMENT'] = 'development'
 

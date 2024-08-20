@@ -2,7 +2,7 @@ import os
 import pytest
 from app.config import Settings
 
-def test_settings_loading():
+def test_settings_loading_development():
     # Set environment to development for this test
     os.environ['ENVIRONMENT'] = 'development'
 
@@ -18,6 +18,7 @@ def test_settings_loading():
     assert settings.database_name == "realty"
     assert settings.database_password is not None
     assert settings.secret_key is not None
+    assert settings.database_url is not None
 
 @pytest.fixture(scope="function", autouse=True)
 def reset_env():
@@ -43,3 +44,4 @@ def test_settings_loading_testing():
     assert settings.database_name is not None
     assert settings.database_password is not None
     assert settings.secret_key is not None
+    assert settings.database_url is not None
