@@ -3,8 +3,11 @@ from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 import os
 
-# Load the base .env file
-load_dotenv(".env")
+# Absolute path of `configs` directory relative to this file
+configs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'config'))
+
+# Load the global .env file
+load_dotenv(os.path.join(configs_dir, ".env"))
 
 class Settings(BaseSettings):
     database_user: str
@@ -29,8 +32,8 @@ class Settings(BaseSettings):
     def __init__(self, **kwargs):
         # Load the environment-specific .env file
         env = os.getenv('ENVIRONMENT', 'development')
-        env_specific = f".env.{env}"
-        load_dotenv(env_specific)
+        env_file = f".env.{env}"
+        load_dotenv(os.path.join(configs_dir, env_file), override=True)
         
         # Validate environment
         self.validate_env_vars()

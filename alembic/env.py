@@ -2,14 +2,8 @@ import os
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 from alembic import context
-from dotenv import load_dotenv
-
-# Load the base .env file
-load_dotenv(".env")
-
-# Load the environment-specific .env file
-env = os.getenv('ENVIRONMENT', 'development')
-load_dotenv(f".env.{env}")
+from app.config import settings
+from app.models import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -22,26 +16,11 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-from app.models import Base
 target_metadata = Base.metadata
-
-# Construct the DATABASE_URL
-def get_env_var(var_name):
-    value = os.getenv(var_name)
-    if not value:
-        raise EnvironmentError(f"Missing required environment variable: {var_name}")
-    return value
-
-database_user = get_env_var('DATABASE_USER')
-database_password = get_env_var('DATABASE_PASSWORD')
-database_name = get_env_var('DATABASE_NAME')
-database_host = os.getenv('DATABASE_HOST', 'localhost')  # Optional with default value
-
-database_url = f"postgresql://{database_user}:{database_password}@{database_host}/{database_name}"
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
-config.set_main_option("sqlalchemy.url", database_url)
+config.set_main_option("sqlalchemy.url", settings.database_url)
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -56,7 +35,7 @@ def run_migrations_offline() -> None:
 
     """
     context.configure(
-        url=database_url,
+        url=settings.database_url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -77,7 +56,7 @@ def run_migrations_online() -> None:
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
-        url=database_url
+        url=settings.database_url
     )
 
     with connectable.connect() as connection:
