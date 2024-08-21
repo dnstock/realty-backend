@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import List, Optional
 from datetime import date
 
@@ -16,19 +16,19 @@ class TokenData(BaseModel):
 class UserBase(BaseModel):
     name: str
     email: str
-
-class UserCreate(UserBase):
     password: str
 
+class UserCreate(UserBase):
+    pass
+
 class UserUpdate(UserBase):
-    hashed_password: str
+    pass
 
 class User(UserBase):
     id: int
     properties: List['Property'] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 ## Property
 
@@ -50,8 +50,7 @@ class Property(PropertyBase):
     manager: User
     buildings: List['Building'] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 ## Building
 
@@ -70,8 +69,7 @@ class Building(BuildingBase):
     property: Property
     units: List['Unit'] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 ## Unit
 
@@ -90,8 +88,7 @@ class Unit(UnitBase):
     building: Building
     leases: List['Lease'] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 ## Lease
 
@@ -111,8 +108,7 @@ class Lease(LeaseBase):
     unit: Unit
     tenants: List['Tenant'] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 ## Tenant
 
@@ -133,8 +129,7 @@ class Tenant(TenantBase):
     lease: Lease
     insurances: List['Insurance'] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 ## Insurance
 
@@ -153,5 +148,4 @@ class Insurance(InsuranceBase):
     id: int
     tenant: Tenant
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
