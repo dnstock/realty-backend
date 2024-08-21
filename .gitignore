@@ -18,3 +18,12 @@
 
 # macOS
 .DS_Store
+
+# Virtual environments (Python)
+venv/
+ENV/
+env/
+.venv/
+.ENV/
+env.bak/
+venv.bak/
