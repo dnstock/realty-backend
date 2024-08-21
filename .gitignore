@@ -87,3 +87,6 @@ alembic/versions/__pycache__/
 
 # macOS
 .DS_Store
+
+# Test SQLite database
+test.db
