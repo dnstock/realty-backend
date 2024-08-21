@@ -59,8 +59,7 @@ def get_users(db: Session, skip: int = 0, limit: int = 10):
 
 def create_user(db: Session, schema: schemas.UserCreate):
     db_obj = models.User(**schema.model_dump())
-    db_obj.__setattr__("hashed_password", auth.get_password_hash(schema.password))
-    db_obj.__delattr__("password")
+    db_obj.__setattr__("password", auth.get_password_hash(schema.password))
     db.add(db_obj)
     db.commit()
     db.refresh(db_obj)
