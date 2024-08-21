@@ -238,5 +238,3 @@ def update_insurance(
     validate_ownership(db, current_user, "Insurance", insurance_id)
     return crud.update_insurance(db, insurance, insurance_id)
 
-
-
