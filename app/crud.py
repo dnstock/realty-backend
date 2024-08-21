@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import NoResultFound, MultipleResultsFound
 from . import models, schemas, auth
 
 ## HEIRARCHY OF RESOURCES
@@ -9,7 +10,12 @@ from . import models, schemas, auth
 """ HELPER FUNCTIONS """
 
 def get_one(db: Session, model, id: int):
-    return db.query(model).filter(model.id == id).first()
+    try:
+        return db.query(model).filter(model.id == id).one()
+    except NoResultFound:
+        return None
+    except MultipleResultsFound:
+        return None
 
 #(HARDEN THIS FUNCTION BEFORE USING)
 # def get_one_by(db: Session, model, **kwargs):
@@ -28,12 +34,17 @@ def create_and_commit(db: Session, model, schema, parent_key, parent_value):
 
 # TODO: Ensure user input does not override primary key or foreign key values!
 def update_and_commit(db: Session, model, schema, id):
-    db_obj = db.query(model).filter(model.id == id).first()
-    for key, value in schema.model_dump().items():
-        setattr(db_obj, key, value)
-    db.commit()
-    db.refresh(db_obj)
-    return db_obj
+    try:
+        db_obj = db.query(model).filter(model.id == id).one()
+        for key, value in schema.model_dump().items():
+            setattr(db_obj, key, value)
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj
+    except NoResultFound:
+        return None
+    except MultipleResultsFound:
+        return None
 
 #(DELETE WILL BE IMPLEMENTED LATER)
 # def delete_and_commit(db: Session, model, id):
@@ -49,10 +60,20 @@ def update_and_commit(db: Session, model, schema, id):
 ## This model does not have a parent resource so we will not be using the helper functions
 
 def get_user(db: Session, id: int):
-    return db.query(models.User).filter(models.User.id == id).first()
+    try:
+        return db.query(models.User).filter(models.User.id == id).one()
+    except NoResultFound:
+        return None
+    except MultipleResultsFound:
+        return None
 
 def get_user_by_email(db: Session, email: str):
-    return db.query(models.User).filter(models.User.email == email).first()
+    try:
+        return db.query(models.User).filter(models.User.email == email).one()
+    except NoResultFound:
+        return None
+    except MultipleResultsFound:
+        return None
 
 def get_users(db: Session, skip: int = 0, limit: int = 10):
     return db.query(models.User).offset(skip).limit(limit).all()
@@ -66,14 +87,19 @@ def create_user(db: Session, schema: schemas.UserCreate):
     return db_obj
 
 def update_user(db: Session, schema: schemas.UserUpdate, id: int):
-    db_obj = db.query(models.User).filter(models.User.id == id).first()
-    for key, value in schema.model_dump().items():
-        if key == "hashed_password":
-            value = auth.get_password_hash(value)
-        setattr(db_obj, key, value)
-    db.commit()
-    db.refresh(db_obj)
-    return db_obj
+    try:
+        user = db.query(models.User).filter(models.User.id == id).one()
+        for key, value in schema.model_dump().items():
+            if key == "password":
+                value = auth.get_password_hash(value)
+            setattr(user, key, value)
+        db.commit()
+        db.refresh(user)
+        return user
+    except NoResultFound:
+        return None
+    except MultipleResultsFound:
+        return None
 
 
 ## Property
