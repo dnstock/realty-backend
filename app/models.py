@@ -5,17 +5,17 @@ from .database import Base
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     name = Column(String, index=True)
     email = Column(String, unique=True, index=True)
-    hashed_password = Column(String)
+    password = Column(String)
 
     properties = relationship("Property", back_populates="manager")
 
 class Property(Base):
     __tablename__ = "properties"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     address = Column(String, index=True)
     city = Column(String, index=True)
     state = Column(String, index=True)
@@ -28,7 +28,7 @@ class Property(Base):
 class Building(Base):
     __tablename__ = "buildings"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     name = Column(String, index=True)
     property_id = Column(Integer, ForeignKey("properties.id"))
 
@@ -38,7 +38,7 @@ class Building(Base):
 class Unit(Base):
     __tablename__ = "units"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     number = Column(String, index=True)
     building_id = Column(Integer, ForeignKey("buildings.id"))
 
@@ -48,7 +48,7 @@ class Unit(Base):
 class Lease(Base):
     __tablename__ = "leases"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     start_date = Column(Date)
     end_date = Column(Date)
     unit_id = Column(Integer, ForeignKey("units.id"))
@@ -59,7 +59,7 @@ class Lease(Base):
 class Tenant(Base):
     __tablename__ = "tenants"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     name = Column(String, index=True)
     email = Column(String, unique=True, index=True)
     phone = Column(String, index=True)
@@ -71,7 +71,7 @@ class Tenant(Base):
 class Insurance(Base):
     __tablename__ = "insurances"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     policy_number = Column(String, index=True)
     expiration_date = Column(Date)
     tenant_id = Column(Integer, ForeignKey("tenants.id"))
