@@ -29,7 +29,7 @@ DATABASE_NAME=
 SECRET_KEY=
 ```
 
-To create a new `SECRET_KEY` use the script:
+To create a new `SECRET_KEY` run the script:
 ```
-/scripts/generate_secret_key.py
+python /scripts/generate_secret_key.py
 ```
