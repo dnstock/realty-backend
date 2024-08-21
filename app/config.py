@@ -6,11 +6,6 @@ import os
 # Load the base .env file
 load_dotenv(".env")
 
-# Load the environment-specific .env file
-env = os.getenv('ENVIRONMENT', 'development')
-env_specific = f".env.{env}"
-load_dotenv(env_specific)
-
 class Settings(BaseSettings):
     database_user: str
     database_password: str
@@ -32,6 +27,12 @@ class Settings(BaseSettings):
             raise ValidationError(f"Missing required environment variables: {', '.join(missing_vars)}")
 
     def __init__(self, **kwargs):
+        # Load the environment-specific .env file
+        env = os.getenv('ENVIRONMENT', 'development')
+        env_specific = f".env.{env}"
+        load_dotenv(env_specific)
+        
+        # Validate environment
         self.validate_env_vars()
         super().__init__(**kwargs)
         self.database_url = f"postgresql://{self.database_user}:{self.database_password}@{self.database_host}/{self.database_name}"
