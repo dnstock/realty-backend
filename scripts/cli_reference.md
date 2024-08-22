@@ -1,3 +1,23 @@
+```bash
+# =========================
+## DOCKER
+# =========================
+
+# start the app
+docker-compose up
+
+# stop the app
+docker-compose down
+
+# rebuild the app
+docker-compose up --build
+
+# (from backend dir) build the image with a different environment
+docker build --build-arg ENVIRONMENT=production -t realty-backend .
+
+# (from backend dir) run the container with a different environment
+docker run -e ENVIRONMENT=production -p 8000:8000 realty-backend
+
 # =========================
 ## APPLICATION
 # =========================
@@ -50,4 +70,4 @@ brew services start postgresql
 
 # cli access
 psql postgres
-
+```

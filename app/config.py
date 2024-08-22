@@ -10,14 +10,17 @@ configs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'con
 load_dotenv(os.path.join(configs_dir, ".env"))
 
 class Settings(BaseSettings):
+    environment: str
     database_user: str
     database_password: str
     database_name: str
     database_host: str = 'localhost'
+    database_port: int = 5432
     secret_key: str
     algorithm: str
     access_token_expire_minutes: int
     database_url: str = ''
+    is_docker: bool = False  # Will be set to True if running in Docker
     
     @classmethod
     def validate_env_vars(cls):
@@ -31,14 +34,19 @@ class Settings(BaseSettings):
 
     def __init__(self, **kwargs):
         # Load the environment-specific .env file
-        env = os.getenv('ENVIRONMENT', 'development')
-        env_file = f".env.{env}"
+        env_file = f".env.{os.getenv('ENVIRONMENT')}"
         load_dotenv(os.path.join(configs_dir, env_file), override=True)
         
         # Validate environment
         self.validate_env_vars()
         super().__init__(**kwargs)
-        self.database_url = f"postgresql://{self.database_user}:{self.database_password}@{self.database_host}/{self.database_name}"
+        
+        # Set default database host for Docker
+        if self.database_host == 'localhost' and self.is_docker:
+            self.database_host = 'host.docker.internal'
+        
+        # Create the database URL
+        self.database_url = f"postgresql://{self.database_user}:{self.database_password}@{self.database_host}:{self.database_port}/{self.database_name}"
 
 # Initialize settings
 settings = Settings()
