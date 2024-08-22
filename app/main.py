@@ -13,9 +13,8 @@ app = FastAPI()
 models.Base.metadata.create_all(bind=database.engine)    
 
 
-## Token Management
+## Authentication Management
 
-@app.post("/token", response_model=schemas.Token)
 # Define the allowed origins
 origins = [
     "http://localhost:3000",  # React development server
@@ -30,11 +29,12 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers (Authorization, Content-Type, etc.)
 )
 
+@app.post("/login", response_model=schemas.Token)
 async def login_for_access_token(db: Session = Depends(database.get_db), form_data: OAuth2PasswordRequestForm = Depends()):
     user = auth.authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
-            status_code=400,
+            status_code=401,
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
