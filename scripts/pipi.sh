@@ -2,4 +2,4 @@
 # Install the required python packages for the project.
 #
 
-pip install -r requirements.txt
+pip install --no-cache-dir -r requirements.txt
