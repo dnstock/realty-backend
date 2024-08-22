@@ -1,7 +1,7 @@
 # Build the image with a different environment:
 #    docker build --build-arg ENVIRONMENT=production -t realty-backend .
 
-# Run the container with a different environment:**
+# Run the container with a different environment:
 #    docker run -e ENVIRONMENT=production -p 8000:8000 realty-backend
 
 # Use an official Python runtime as a parent image
