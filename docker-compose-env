@@ -1,0 +1,23 @@
+###
+# DO NOT MODIFY OR RENAME THE `docker-compose-env` FILE!!
+# Copy it to .env then uncomment the appropriate section in the .env file:
+#   cp docker-compose-env .env
+#
+# NOTE:
+#   This is only intended to be used with the docker compose commands.
+#   It must remain in the same directory as the docker-compose.yml file.
+#
+# PRODUCTION MODE  : uses Nginx web server for frontend
+# DEVELOPMENT MODE : uses Node.js `serve` package for frontend
+#
+###
+
+# Uncomment the following lines to run the app in development mode
+#TARGET=development
+#FRONTEND_PORT=3000
+#NODE_ENV=development
+
+# Uncomment the following lines to run the app in production mode
+#TARGET=production
+#FRONTEND_PORT=80
+#NODE_ENV=production

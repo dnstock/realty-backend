@@ -47,6 +47,15 @@ realty/
     pytest tests
     ```
 
+1. **Setup Docker to use development environment:**
+    ```bash
+    # Copy the docker-compose-env file to .env
+    cp docker-compose-env .env
+
+    # Open .env and uncomment the development mode section
+    vi .env
+    ```
+
 1. **Run the application with Docker:**
     ```bash
     docker-compose up --build
@@ -60,17 +69,17 @@ realty/
 
 - **Start the services:**
     ```bash
-    docker-compose up
+    docker compose up --build
     ```
 
 - **Stop the services:**
     ```bash
-    docker-compose down
+    docker compose down
     ```
 
 - **Rebuild the services:**
     ```bash
-    docker-compose up --build
+    docker compose up --build
     ```
 
 ### Project Details
