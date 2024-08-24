@@ -2,12 +2,11 @@ from pydantic import BaseModel, ConfigDict
 from typing import List, Optional
 from datetime import date
 
-## Token
-
-class Token(BaseModel):
+class AuthResponse(BaseModel):
     access_token: str
     token_type: str
-    
+    user: 'User'
+
 class TokenData(BaseModel):
     email: Optional[str] = None
 
@@ -16,13 +15,12 @@ class TokenData(BaseModel):
 class UserBase(BaseModel):
     name: str
     email: str
-    password: str
 
 class UserCreate(UserBase):
-    pass
+    password: str
 
 class UserUpdate(UserBase):
-    pass
+    password: str
 
 class User(UserBase):
     id: int

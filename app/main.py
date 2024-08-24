@@ -29,7 +29,7 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers (Authorization, Content-Type, etc.)
 )
 
-@app.post("/login", response_model=schemas.Token)
+@app.post("/login", response_model=schemas.AuthResponse)
 async def login_for_access_token(db: Session = Depends(database.get_db), form_data: OAuth2PasswordRequestForm = Depends()):
     user = auth.authenticate_user(db, form_data.username, form_data.password)
     if not user:
@@ -42,7 +42,15 @@ async def login_for_access_token(db: Session = Depends(database.get_db), form_da
     access_token = auth.create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {
+            "id": user.id,
+            "email": user.email,
+            "name": user.name,
+        }
+    }
 
 
 ## User Management
