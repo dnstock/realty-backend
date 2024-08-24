@@ -23,6 +23,7 @@ services:
       - "${FRONTEND_PORT:?error}:${FRONTEND_PORT:?error}"
     volumes:
       - ./frontend:/app
+      - /app/build
     environment:
       - CHOKIDAR_USEPOLLING=true
       - NODE_ENV=${NODE_ENV:?error}
