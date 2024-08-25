@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+from pydantic import ValidationError
 from typing import List
 from datetime import timedelta
 from fastapi.security import OAuth2PasswordRequestForm
@@ -74,10 +75,13 @@ async def refresh_access_token(token: str, db: Session = Depends(database.get_db
 
 @app.post("/users/", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(database.get_db)):
-    db_obj = crud.get_user_by_email(db, user.email)
-    if db_obj:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    return crud.create_user(db, user)
+    try:
+        db_obj = crud.get_user_by_email(db, user.email)
+        if db_obj:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
+        return crud.create_user(db, user)
+    except ValidationError as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=e.errors())
 
 @app.get("/users/", response_model=List[schemas.User])
 def read_users(skip: int = 0, limit: int = 10, db: Session = Depends(database.get_db)):
@@ -92,7 +96,10 @@ def read_user(user_id: int, db: Session = Depends(database.get_db)):
 
 @app.put("/users/{user_id}", response_model=schemas.User)
 def update_user(user_id: int, user: schemas.UserUpdate, db: Session = Depends(database.get_db)):
-    return crud.update_user(db, user, user_id)
+    try:
+        return crud.update_user(db, user, user_id)
+    except ValidationError as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=e.errors())
 
 
 ## Property Management
@@ -224,7 +231,10 @@ def create_tenant(
     lease_id: int, tenant: schemas.TenantCreate, db: Session = Depends(database.get_db), current_user: schemas.User = Depends(auth.get_current_user)
 ):
     validate_ownership(db, current_user, "Lease", lease_id)
-    return crud.create_tenant(db, tenant, parent_id=lease_id)
+    try:
+        return crud.create_tenant(db, tenant, parent_id=lease_id)
+    except ValidationError as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=e.errors())
 
 @app.get("/leases/{lease_id}/tenants/", response_model=List[schemas.Tenant])
 def read_tenants(
@@ -245,7 +255,10 @@ def update_tenant(
     tenant_id: int, tenant: schemas.TenantUpdate, db: Session = Depends(database.get_db), current_user: schemas.User = Depends(auth.get_current_user)
 ):
     validate_ownership(db, current_user, "Tenant", tenant_id)
-    return crud.update_tenant(db, tenant, tenant_id)
+    try:
+        return crud.update_tenant(db, tenant, tenant_id)
+    except ValidationError as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=e.errors())
 
 
 ## Insurance Management

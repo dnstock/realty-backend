@@ -3,10 +3,12 @@ from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from . import models, schemas, database, crud
+from pydantic import ValidationError
+from . import database, crud
 from .config import settings
+from .schemas import TokenData
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -44,10 +46,8 @@ def get_current_user(db: Session = Depends(database.get_db), token: str = Depend
     try:
         payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
         email: Optional[str] = payload.get("sub")
-        if email is None:
-            raise credentials_exception
-        token_data = schemas.TokenData(email=email)
-    except JWTError:
+        token_data = TokenData(email=email)
+    except (JWTError, ValidationError):
         raise credentials_exception
     if token_data.email is None:
         raise credentials_exception

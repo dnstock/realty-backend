@@ -1,4 +1,5 @@
 import pytest, os, uuid
+from pydantic import ValidationError
 from datetime import date
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -18,7 +19,7 @@ def generate_test_email():
 schema_user_create = schemas.UserCreate(
     name="Test User", 
     email=generate_test_email(),
-    password="test"
+    password="test1234#$"
 )
 schema_property_create = schemas.PropertyCreate(
     address="123 Main St", 
@@ -107,6 +108,17 @@ def test_create_user(db):
     user = crud.create_user(db, schema_user_create)
     assert user.id is not None
     
+def test_create_user_with_invalid_data(db):
+    schema_user_invalid_data = {
+        "name": "Test User",
+        "email": "invalid-email",
+        "password": "short"
+    }
+    # Assert that the schema will raise a validation error
+    with pytest.raises(ValidationError):
+        schema = schemas.UserCreate(**schema_user_invalid_data)
+        crud.create_user(db, schema)
+    
 def test_update_user(db, test_user):
     new_email = generate_test_email()
     schema_user_update = schemas.UserUpdate(
@@ -119,6 +131,17 @@ def test_update_user(db, test_user):
     assert updated_user.name == "new_username"
     assert updated_user.email == new_email
     assert auth.verify_password("new_password", updated_user.password)
+    
+def test_update_user_with_invalid_data(db, test_user):
+    schema_user_invalid_data = {
+        "name": "Test User",
+        "email": "invalid-email",
+        "password": "short"
+    }
+    # Assert that the schema will raise a validation error
+    with pytest.raises(ValidationError):
+        schema = schemas.UserUpdate(**schema_user_invalid_data)
+        crud.update_user(db, schema, test_user.id)
     
 def test_get_user(db):
     user = crud.get_user(db, 1)
@@ -230,6 +253,18 @@ def test_create_tenant(db, test_lease):
     tenant = crud.create_tenant(db, schema_tenant_create, test_lease.id)
     assert tenant.id is not None    
     
+def test_create_tenant_with_invalid_data(db, test_lease):
+    schema_tenant_invalid_data = {
+        "name": "John Doe",
+        "email": "invalid-email",
+        "phone": "555-555-5555",
+        "lease_id": 1
+    }
+    # Assert that the schema will raise a validation error
+    with pytest.raises(ValidationError):
+        schema = schemas.TenantCreate(**schema_tenant_invalid_data)
+        crud.create_tenant(db, schema, test_lease.id)
+    
 def test_update_tenant(db, test_tenant):
     new_email = generate_test_email()
     schema_tenant_update = schemas.TenantUpdate(
@@ -242,6 +277,18 @@ def test_update_tenant(db, test_tenant):
     assert updated_tenant is not None
     assert updated_tenant.name == "Jane Doe"
     assert updated_tenant.email == new_email
+    
+def test_update_tenant_with_invalid_data(db, test_tenant):
+    schema_tenant_invalid_data = {
+        "name": "John Doe",
+        "email": "invalid-email",
+        "phone": "555-555-5555",
+        "lease_id": 1
+    }
+    # Assert that the schema will raise a validation error
+    with pytest.raises(ValidationError):
+        schema = schemas.TenantUpdate(**schema_tenant_invalid_data)
+        crud.update_tenant(db, schema, test_tenant.id)
     
 def test_get_tenant(db):
     tenant = crud.get_tenant(db, 1)

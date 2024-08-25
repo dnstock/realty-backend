@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, EmailStr
 from typing import List, Optional
 from datetime import date
 
@@ -8,13 +8,13 @@ class AuthResponse(BaseModel):
     user: 'User'
 
 class TokenData(BaseModel):
-    email: Optional[str] = None
+    email: Optional[EmailStr] = None
 
 ## User
 
 class UserBase(BaseModel):
     name: str
-    email: str
+    email: EmailStr
 
 class UserCreate(UserBase):
     password: str
@@ -112,8 +112,8 @@ class Lease(LeaseBase):
 
 class TenantBase(BaseModel):
     name: str
-    email: str
-    phone: str
+    email: Optional[EmailStr] = None
+    phone: Optional[str] = None
     lease_id: int
 
 class TenantCreate(TenantBase):
