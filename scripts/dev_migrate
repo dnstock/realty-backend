@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #
 # Execute database migrations in development environment.
 #

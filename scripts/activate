@@ -1,0 +1,8 @@
+#!/bin/bash
+
+#
+# Activate the virtual environment.
+#
+
+echo "source ../.venv/bin/activate"
+source ../.venv/bin/activate

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #
 # Run application server in development environment.
 #
