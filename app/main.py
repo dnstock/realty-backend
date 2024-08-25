@@ -91,7 +91,7 @@ def read_users(skip: int = 0, limit: int = 10, db: Session = Depends(database.ge
 def read_user(user_id: int, db: Session = Depends(database.get_db)):
     db_obj = crud.get_user(db, user_id)
     if db_obj is None:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return db_obj
 
 @app.put("/users/{user_id}", response_model=schemas.User)

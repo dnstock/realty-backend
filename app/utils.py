@@ -1,4 +1,4 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from . import models, schemas
 
@@ -7,10 +7,10 @@ def validate_ownership(db: Session, user: schemas.User, resource_type: str, reso
     try:
         resource = db.query(getattr(models, resource_type)).filter_by(id=resource_id).first()
     except AttributeError:
-        raise HTTPException(status_code=404, detail="Invalid resource type")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invalid resource type")
     
     if resource is None:
-        raise HTTPException(status_code=404, detail=f"{resource_type} not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{resource_type} not found")
     
     valid = False
     if resource_type == "Property":
@@ -27,5 +27,5 @@ def validate_ownership(db: Session, user: schemas.User, resource_type: str, reso
         valid = resource.tenant.lease.unit.building.property.manager_id == user.id
     
     if not valid:
-        raise HTTPException(status_code=400, detail="Not enough permissions")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Not enough permissions")
     return valid
