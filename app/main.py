@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
@@ -34,10 +34,27 @@ async def login_for_access_token(db: Session = Depends(database.get_db), form_da
     user = auth.authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
-            status_code=401,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
+    access_token = auth.create_access_token(
+        data={"sub": user.email}, expires_delta=access_token_expires
+    )
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {
+            "id": user.id,
+            "email": user.email,
+            "name": user.name,
+        }
+    }
+
+@app.post("/token/refresh", response_model=schemas.AuthResponse)
+async def refresh_access_token(token: str, db: Session = Depends(database.get_db)):
+    user = auth.get_current_user(db, token)
     access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
     access_token = auth.create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires
