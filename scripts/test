@@ -1,0 +1,10 @@
+#!/bin/bash
+
+#
+# Run tests in development environment.
+#
+# Usage:
+#   ./test <test_name>
+#
+
+ENVIRONMENT=development pytest tests/test_$1.py
