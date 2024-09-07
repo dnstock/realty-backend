@@ -7,4 +7,4 @@
 #   ./test <test_name>
 #
 
-ENVIRONMENT=development pytest tests/test_$1.py
+pytest app/tests/test_$1.py

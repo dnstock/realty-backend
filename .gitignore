@@ -5,6 +5,9 @@
 # Environments
 .env
 .env.*
+# Skip example .env files
+!.env.example
+!.env.*.example
 
 # Jetbrains
 .idea/

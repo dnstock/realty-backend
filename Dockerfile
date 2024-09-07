@@ -26,7 +26,7 @@ COPY . .
 ENV ENVIRONMENT=development
 
 # Set an environment variable for the Docker container
-ENV IS_DOCKER=true
+ENV APP_IS_DOCKED=true
 
 # Make port 8000 available to the world outside this container
 EXPOSE 8000

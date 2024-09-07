@@ -29,8 +29,8 @@ realty/
     ```
 
 1. **Set up environment variables:**
-   - Create appropriate `.env` files. 
-   - Refer to `README` in the `/backend/config/` directory for instructions.
+   - Create `.env` file and fill in appropriate values. Refer to `backend/envs/.env.example` file.
+   - Optionally, create environment-specific files. Refer to `backend/envs/*.example` files.
 
 1. **Set up database and run migrations:**
     - Create a PostgreSQL database.
