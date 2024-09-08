@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from core import settings
 from app.api import api_router, register_middleware, register_error_handlers
-from . import print_startup_info
+from core import utils
+import platform
 
 app = FastAPI()
 
@@ -14,9 +15,7 @@ register_middleware(app)
 # Register API routes
 app.include_router(api_router, prefix="/api")
 
-# Run when the application starts
-# Array of key-value pairs to display
-print_startup_info([
+app_info = [
     ('Application Name', settings.app_name),
     ('Environment', settings.app_env),
     ('Debug Mode', str(settings.app_debug)),
@@ -24,4 +23,11 @@ print_startup_info([
     ('Log Directory', f'./{settings.log_dir}/'),
     ('Log Level', settings.log_level),
     ('SQL Query Logging', str(settings.sqlalchemy_echo)),
-])
+]
+
+system_info = [
+    ('Python Version', platform.python_version()),
+]
+
+# Run when the application starts
+utils.print_boxed_sections(app_info, system_info, title="Application Information")
