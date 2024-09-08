@@ -1,4 +1,3 @@
-from sqlalchemy.orm import Session
 from typing import Optional, List
 from sqlalchemy.sql.expression import and_
 from sqlalchemy.sql import exists
@@ -7,24 +6,30 @@ from typing import Callable
 from core import logger, security
 from schemas import UserSchema
 from db.models import User
-from db import models, get_db_session
+from db import models, get_db
 
-def email_exists(email: str, db: Session = get_db_session()) -> bool:
+def email_exists(email: str) -> bool:
+    db = get_db()
     return db.query(exists().where(User.email == email)).scalar()
 
-def is_active(email: str, db: Session = get_db_session()) -> bool:
+def is_active(email: str) -> bool:
+    db = get_db()
     return db.query(exists().where(and_(User.email == email, User.is_active == True))).scalar()
 
-def get_by_id(id: int, db: Session = get_db_session()) -> Optional[User]:
+def get_by_id(id: int) -> Optional[User]:
+    db = get_db()
     return db.query(User).filter(User.id == id).one_or_none()
 
-def get_by_email(email: str, db: Session = get_db_session()) -> Optional[User]:
+def get_by_email(email: str) -> Optional[User]:
+    db = get_db()
     return db.query(User).filter(User.email == email).one_or_none()
 
-def get_all(skip: int = 0, limit: int = 10, db: Session = get_db_session()) -> List[User]:
+def get_all(skip: int = 0, limit: int = 10) -> List[User]:
+    db = get_db()
     return db.query(User).offset(skip).limit(limit).all()
 
-def create_and_commit(schema: UserSchema.Create, db: Session = get_db_session()) -> Optional[User]:
+def create_and_commit(schema: UserSchema.Create) -> Optional[User]:
+    db = get_db()
     try:
         db_obj = User(**schema.model_dump())
         setattr(db_obj, "password", security.get_password_hash(schema.password))
@@ -37,7 +42,8 @@ def create_and_commit(schema: UserSchema.Create, db: Session = get_db_session())
         logger.error(f"Error creating user: {e}")
         return None
 
-def update_and_commit(schema: UserSchema.Update, id: int, db: Session = get_db_session()) -> Optional[User]:
+def update_and_commit(schema: UserSchema.Update, id: int) -> Optional[User]:
+    db = get_db()
     try:
         user = db.query(User).filter(User.id == id).one()
         for key, value in schema.model_dump().items():
@@ -58,7 +64,8 @@ def update_and_commit(schema: UserSchema.Update, id: int, db: Session = get_db_s
         logger.error(f"Error updating user: {e}")
         return None
     
-def validate_ownership(current_user: UserSchema.Read, model_name: str, resource_id: int, db: Session = get_db_session()) -> bool:
+def validate_ownership(current_user: UserSchema.Read, model_name: str, resource_id: int) -> bool:
+    db = get_db()
     try:
         db_obj = db.query(getattr(models, model_name)).filter_by(id=resource_id).one_or_none()
         if db_obj is None:

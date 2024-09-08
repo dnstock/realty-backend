@@ -15,6 +15,7 @@ api_router.include_router(v1_router, prefix="/v1")
 # Register middleware for the API
 def register_middleware(app: FastAPI) -> None:
     cors_middleware(app)
+    db_session_middleware(app)
     
     # Register v1-specific middleware
     register_v1_middleware(app)

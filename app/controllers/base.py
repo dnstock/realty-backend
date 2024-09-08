@@ -1,9 +1,8 @@
-from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound, MultipleResultsFound, IntegrityError
 from pydantic import BaseModel
 from typing import Type, TypeVar, Optional, List
 from core import logger
-from db import Base, get_db_session
+from db import Base, get_db
 
 ## HEIRARCHY OF RESOURCES
 # Manager -> Property -> Building -> Unit -> Lease -> Tenant -> Insurance
@@ -13,7 +12,8 @@ from db import Base, get_db_session
 # Define a generic type for models
 T = TypeVar('T', bound=Base)
 
-def get_by_id(model: 'Type[T]', id: int, db: Session = get_db_session()) -> 'Optional[T]':
+def get_by_id(model: 'Type[T]', id: int) -> 'Optional[T]':
+    db = get_db()
     try:
         return db.query(model).filter(getattr(model, 'id') == id).one()
     except NoResultFound:
@@ -21,10 +21,12 @@ def get_by_id(model: 'Type[T]', id: int, db: Session = get_db_session()) -> 'Opt
     except MultipleResultsFound:
         return None
 
-def get_all(model: Type[T], parent_key: str, parent_value: int, skip: int = 0, limit: int = 10, db: Session = get_db_session()) -> List[T]:
+def get_all(model: Type[T], parent_key: str, parent_value: int, skip: int = 0, limit: int = 10) -> List[T]:
+    db = get_db()
     return db.query(model).filter(getattr(model, parent_key) == parent_value).offset(skip).limit(limit).all()
 
-def create_and_commit(model: Type[T], schema: BaseModel, parent_key: str, parent_value: int, db: Session = get_db_session()) -> Optional[T]:
+def create_and_commit(model: Type[T], schema: BaseModel, parent_key: str, parent_value: int) -> Optional[T]:
+    db = get_db()
     try:
         db_obj = model(**schema.model_dump())
         db_obj.__setattr__(parent_key, parent_value)
@@ -41,7 +43,8 @@ def create_and_commit(model: Type[T], schema: BaseModel, parent_key: str, parent
         logger.error(f"An error occurred: {e}")
         return None
 
-def update_and_commit(model: Type[T], schema: BaseModel, id: int, db: Session = get_db_session()) -> Optional[T]:
+def update_and_commit(model: Type[T], schema: BaseModel, id: int) -> Optional[T]:
+    db = get_db()
     try:
         db_obj = db.query(model).filter(getattr(model, 'id') == id).one()
         
