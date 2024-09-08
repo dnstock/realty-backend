@@ -5,7 +5,7 @@ from datetime import date
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from core import security
-from db import Base, db_context
+from db import Base, db_session_context
 from controllers import (
     UserController,
     PropertyController,
@@ -31,7 +31,7 @@ def setup_and_teardown():
     engine = create_engine(f'sqlite:///./{db_name}')  # Use an in-memory database
     TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     Base.metadata.create_all(bind=engine)  # Create all the tables
-    db_context.set(TestingSessionLocal())  # Override the middleware db session
+    db_session_context.set(TestingSessionLocal())  # Override the middleware db session
     try:
         yield  # Run the tests
     finally:

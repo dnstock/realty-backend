@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Request, Response
 from typing import Callable, Awaitable
 from core.config import settings
-from db import SessionLocal, db_context
+from db import SessionLocal, db_session_context
 
 # CORS settings for the API
 def cors_middleware(app: FastAPI) -> None:
@@ -18,14 +18,14 @@ def cors_middleware(app: FastAPI) -> None:
 class DBSessionMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         with SessionLocal() as db:
-            db_context.set(db)
+            db_session_context.set(db)
             try:
                 response = await call_next(request)
             except Exception as e:
                 db.rollback()  # Ensure that any pending transactions are safely aborted
                 raise e
             finally:
-                db_context.set(None)
+                db_session_context.set(None)
                 db.close()
         return response
 

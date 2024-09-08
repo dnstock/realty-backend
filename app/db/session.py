@@ -1,7 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker, scoped_session
 from core import settings
-import contextvars
+from contextvars import ContextVar
+from typing import Optional
 
 engine = create_engine(
     settings.postgres_url,
@@ -21,10 +22,10 @@ SessionLocal = scoped_session(sessionmaker(
 ))
 
 # Create a context variable to hold the db session
-db_context: contextvars.ContextVar[Session | None] = contextvars.ContextVar("db_session", default=None)
+db_session_context: ContextVar[Optional[Session]] = ContextVar("db_session", default=None)
 
 def get_db() -> Session:
-    db = db_context.get()
+    db = db_session_context.get()
     if db is None:
         raise Exception("Database session not found")
     return db
