@@ -1,11 +1,15 @@
 from pydantic import Field, field_validator, ValidationInfo
 from pydantic_settings import BaseSettings
-from typing import Optional
+from typing import Optional, Literal
 from pathlib import Path
 import os
 
 APP_DIR = Path(__file__).resolve().parent.parent  # ./backend/app/
 ROOT_DIR = APP_DIR.parent                         # ./backend/
+
+# Check if the app is running in a Docker container
+cgroup_file = Path('/proc/self/cgroup')
+is_docker_env = Path('/.dockerenv').exists() or (cgroup_file.is_file() and any('docker' in line for line in cgroup_file.open()))
 
 # Add default .env file and environment-specific .env file if it exists
 env_specific_file = ROOT_DIR / 'envs' / f'.env.{os.getenv('ENVIRONMENT')}'
@@ -14,13 +18,13 @@ if Path(env_specific_file).is_file():
     env_files += (env_specific_file,)
     
 class Settings(BaseSettings):
-    # Application and Server Settings
+    # Application and Server Configuration
     app_name: str = Field(..., description='The name of the application')
     app_host: str = Field(..., description='The host the application is running on')
     app_port: int = Field(..., description='The port the application is running on')
     app_env: str = Field(..., description='The environment the application is running in')
     app_debug: bool = Field(False, description='The debug mode of the application')
-    app_is_docked: bool = False
+    app_is_docked: bool = is_docker_env
     
     # Database Configuration
     postgres_user: str = Field(..., description='Postgres database user')
@@ -38,7 +42,7 @@ class Settings(BaseSettings):
     sqlalchemy_future: bool = True  # Use the latest features and deprecations
     sqlalchemy_echo: bool = False  # Implementation of postgres_log_queries
     
-    # JWT and Security Settings
+    # JWT and Security Configuration
     jwt_secret_key: str = Field(..., description='JWT secret')
     jwt_algorithm: str = Field(..., description='JWT algorithm')
     jwt_access_token_expire_minutes: int = Field(..., description='JWT access token expiry time in minutes')
@@ -46,11 +50,11 @@ class Settings(BaseSettings):
     # jwt_reset_password_token_expire_minutes: int = Field(..., description='JWT reset password token expiry time in minutes')
     # jwt_verify_email_token_expire_minutes: int = Field(..., description='JWT verify email token expiry time in minutes')
     
-    # API settings
+    # API Configuration
     api_cors_origins: list[str] = Field(..., description='List of allowed origins')
     api_v1_cors_origins: Optional[list[str]] = Field(None, description='List of allowed origins specific for v1 API')
     
-    # Redis or Cache Settings
+    # Redis or Cache Configuration
     redis_host: str = Field(..., description='Redis server hostname or IP address')
     redis_port: int = Field(6379, description='Redis server port')
     redis_db: int = Field(0, description='Redis database index')
@@ -58,19 +62,30 @@ class Settings(BaseSettings):
     redis_db_url: str = ''
     redis_cache_url: str = ''
     
-    # Email settings (for future use)
-    email_host: Optional[str] = Field(None, description='Email host')
-    email_port: Optional[int] = Field(None, description='Email port')
-    email_user: Optional[str] = Field(None, description='Email user')
-    email_password: Optional[str] = Field(None, description='Email password')
+    # Email Configuration
+    smtp_server: Optional[str] = Field(None, description='Email host')
+    smtp_port: Optional[str] = Field(None, description='Email port')
+    smtp_user: Optional[str] = Field(None, description='Email user')
+    smtp_password: Optional[str] = Field(None, description='Email password')
     
     # Logging Configuration
     log_dir: str = Field('logs', description='The log directory of the application')
     log_file: str = Field('app.log', description='The log file of the application')
     log_level: str = Field('INFO', description='The log level of the application')
+    log_level_file: Optional[str] = Field(None, description='The log level for the log file (optional)')
+    log_level_console: Optional[str] = Field(None, description='The log level for the console (optional)')
     log_max_files: int = Field(5, description='The max log files to store')
     log_max_file_size_bytes: int = Field(5242880, description='The max file size in bytes for each log file')
-    log_format: str = Field('%(asctime)s - %(name)s - %(levelname)s - %(message)s', description='The message format for log files')
+    log_format: Literal['text', 'json'] = Field('text', description='The log formatter to use (text or json)')
+    log_format_file: Optional[Literal['text', 'json']] = Field(None, description='The log formatter for the log file (optional)')
+    log_format_console: Optional[Literal['text', 'json']] = Field(None, description='The log formatter for the console (optional)')
+    
+    # Alerts Configuration
+    alerts_email_enabled: bool = Field(False, description='Enable email alerts')
+    alerts_email_from: Optional[str] = Field(None, description='Email address to send alerts from')
+    alerts_email_to: Optional[str] = Field(None, description='Email address to send alerts to')
+    alerts_sms_enabled: Optional[bool] = Field(False, description='Enable SMS alerts')
+    alerts_slack_enabled: Optional[bool] = Field(False, description='Enable Slack alerts')
 
     # Possible future settings
     # app_version: str = Field(..., description='The version of the application')
@@ -100,19 +115,13 @@ class Settings(BaseSettings):
         # 'validate_default': True,
     }
 
-    # Check whether the app is running in a Docker container
-    @field_validator('app_is_docked', mode='before')
-    def set_app_is_docked(cls, value: bool | None) -> bool:
-        path = '/proc/self/cgroup'
-        return (
-            Path('/.dockerenv').exists() or
-            (Path(path).is_file() and any('docker' in line for line in Path(path).open()))
-        )
-        
-    @field_validator('log_level', mode='before')
-    def capitalize_log_level(cls, value: str) -> str:
-        return value.upper()
-    
+    # Adjust hostnames if running in Docker container
+    @field_validator('postgres_host', 'redis_host', mode='before')
+    def adjust_hostnames(cls, v: str) -> str:
+        if v == 'localhost' and is_docker_env:
+            return 'host.docker.internal'
+        return v
+
     # Set the SQLAlchemy echo flag
     @field_validator('sqlalchemy_echo', mode='after')
     def set_sqlalchemy_echo(cls, v: bool | None, info: ValidationInfo) -> bool:
@@ -121,52 +130,41 @@ class Settings(BaseSettings):
             # Default to True in development
             return values['app_env'] == 'development'
         else:
-            # Set to `postgres_debug_log_queries` if defined
+            # Set to value of environment variable, if defined
             return values['postgres_debug_log_queries']
-
-    # Assemble the database URL and the test database URL
-    @field_validator('postgres_url', 'postgres_test_url', mode='after')
-    def adjust_database_host_and_url(cls, v: str | None, info: ValidationInfo) -> str:
-        values = info.data
-        # Adjust postgres_host if running in Docker
-        if values['postgres_host'] == 'localhost' and values['app_is_docked']:
-            values['postgres_host'] = 'host.docker.internal'
-        
-        # Construct URL
-        url = (
-            f'postgresql://{values['postgres_user']}:{values['postgres_password']}'
-            f'@{values['postgres_host']}:{values['postgres_port']}/'
-        )
-        
-        # Assign appropriate URLs
-        values['postgres_url'] = url + values['postgres_db']
-        values['postgres_test_url'] = url + values['postgres_test_db']
-        
-        # Return the updated URL for each field
-        if v == values['postgres_url']:
-            return values['postgres_url']
-        return values['postgres_test_url']
     
-    # Assembly the Redis URL and the Redis cache URL
+    # Uppercase the log levels
+    @field_validator('log_level', 'log_level_file', 'log_level_console', mode='before')
+    def ensure_uppercase_log_levels(cls, v: str | None, info: ValidationInfo) -> str:
+        values = info.data
+        return values['log_level'].upper() if v is None else v.upper()
+    
+    # Set the log formats
+    @field_validator('log_format', 'log_format_file', 'log_format_console', mode='after')
+    def set_log_formats(cls, v: str | None, info: ValidationInfo) -> str:
+        values = info.data
+        return values['log_format'].lower() if v is None else v.lower()
+    
+    # Construct the database URLs
+    @field_validator('postgres_url', 'postgres_test_url', mode='after')
+    def construct_database_urls(cls, v: str | None, info: ValidationInfo) -> str:
+        values = info.data
+        base_url = (
+            f"postgresql://{values['postgres_user']}:{values['postgres_password']}"
+            f"@{values['postgres_host']}:{values['postgres_port']}/"
+        )
+        if info.field_name == 'postgres_test_url':
+            return base_url + values['postgres_test_db']
+        return base_url + values['postgres_db']
+    
+    # Construct the Redis URLs
     @field_validator('redis_db_url', 'redis_cache_url', mode='after')
     def adjust_redis_host_and_url(cls, v: str | None, info: ValidationInfo) -> str:
         values = info.data
-        # Adjust redis_host if running in Docker
-        if values['redis_host'] == 'localhost' and values['app_is_docked']:
-            # Modify redis_host directly in the values dictionary
-            values['redis_host'] = 'host.docker.internal'
-        
-        # Construct Redis URL
-        url = f'redis://{values["redis_host"]}:{values["redis_port"]}/'
-        
-        # Assign the Redis DB URLs
-        values['redis_db_url'] = url + str(values['redis_db'])
-        values['redis_cache_url'] = url + str(values['redis_cache_db'])
-        
-        # Return the specific value being validated
-        if v == values['redis_db_url']:
-            return values['redis_db_url']
-        return values['redis_cache_url']
+        base_url = f'redis://{values["redis_host"]}:{values["redis_port"]}/'
+        if info.field_name == 'redis_cache_url':
+            return base_url + str(values['redis_cache_db'])
+        return base_url + str(values['redis_db'])
 
 # Initialize settings
 settings = Settings()  # type: ignore (values will be set by env variables)

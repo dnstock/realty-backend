@@ -1,13 +1,19 @@
 import logging
-from logging.handlers import RotatingFileHandler
+import json
+from logging.handlers import RotatingFileHandler, SMTPHandler
 from fastapi import Request
 from pathlib import Path
 from core import settings
+from typing import Optional
+from contextvars import ContextVar
 
-# Set up the log level
-log_level = getattr(logging, settings.log_level.upper(), logging.INFO)
+# Request ID for correlating logs to a single request
+request_id_context: ContextVar[Optional[str]] = ContextVar("request_id", default=None)
 
-# Ensure the log directory exists
+# Set up the log level dynamically from settings
+log_level = getattr(logging, settings.log_level, logging.INFO)
+
+# Ensure the log directory exists (using pathlib for cleaner handling)
 log_dir = Path(settings.log_dir)
 log_dir.mkdir(parents=True, exist_ok=True)
 
@@ -21,22 +27,56 @@ file_handler = RotatingFileHandler(
     maxBytes=settings.log_max_file_size_bytes,
     backupCount=settings.log_max_files
 )
-file_handler.setLevel(log_level)
+file_handler.setLevel(getattr(logging, settings.log_level_file, log_level))  # type: ignore (handled by field validator)
 
 # Create console handler for logging to stdout
 console_handler = logging.StreamHandler()
-console_handler.setLevel(log_level)
+console_handler.setLevel(getattr(logging, settings.log_level_console, log_level))  # type: ignore (handled by field validator)
 
-# Define the logging format
-formatter = logging.Formatter(settings.log_format)
-file_handler.setFormatter(formatter)
-console_handler.setFormatter(formatter)
+# Text formatter for standard logging
+text_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+# JSON formatter for structured logging
+class JsonFormatter(logging.Formatter):
+    def format(self, record: logging.LogRecord) -> str:
+        log_record = {
+            'timestamp': self.formatTime(record),
+            'level': record.levelname,
+            'message': record.getMessage(),
+            'module': record.module,
+            'filename': record.filename,
+            'request_id': request_id_context.get(),
+            'exception': self.formatException(record.exc_info) if record.exc_info else None,
+        }
+        return json.dumps(log_record)
+json_formatter = JsonFormatter()
+
+# Set the file and console formatters
+file_handler.setFormatter(json_formatter if settings.log_format_file == 'json' else text_formatter)
+console_handler.setFormatter(json_formatter if settings.log_format_console == 'json' else text_formatter)
+    
+# Optional: Create an SMTP handler for critical errors (e.g. email alerts)
+smtp_handler = SMTPHandler(
+    mailhost=(settings.smtp_server, settings.smtp_port),       # type: ignore (handled by field validator)
+    fromaddr=settings.alerts_email_from,                       # type: ignore (handled by field validator)
+    toaddrs=settings.alerts_email_to,                          # type: ignore (handled by field validator)
+    subject="Critical Error in Application",
+    credentials=(settings.smtp_user, settings.smtp_password),  # type: ignore (handled by field validator)
+    secure=()
+)
+smtp_handler.setLevel(logging.CRITICAL)
 
 # Add handlers to the logger only if not already added
 if not logger.hasHandlers():
     logger.addHandler(file_handler)
     logger.addHandler(console_handler)
+    if settings.alerts_email_enabled:
+        logger.addHandler(smtp_handler)
 
 # Log exceptions
 async def log_exception(request: Request, exc: Exception) -> None:
-    logger.error(f"Exception occurred in {request.url.path}: {exc}", exc_info=True)
+    logger.error(
+        f"Exception occurred in {request.url.path}: {exc}",
+        exc_info=True,
+        extra={"request_id": request_id_context.get()}
+    )

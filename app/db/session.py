@@ -4,6 +4,9 @@ from core import settings
 from contextvars import ContextVar
 from typing import Optional
 
+# Create a context variable to hold the db session
+db_session_context: ContextVar[Optional[Session]] = ContextVar("db_session", default=None)
+
 engine = create_engine(
     settings.postgres_url,
     pool_size=settings.postgres_pool_size,
@@ -20,9 +23,6 @@ SessionLocal = scoped_session(sessionmaker(
     autoflush=False,
     bind=engine
 ))
-
-# Create a context variable to hold the db session
-db_session_context: ContextVar[Optional[Session]] = ContextVar("db_session", default=None)
 
 def get_db() -> Session:
     db = db_session_context.get()
