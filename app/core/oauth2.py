@@ -7,7 +7,7 @@ from core import settings
 from schemas import UserSchema
 from controllers import UserController
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 def create_access_token(data: dict[str, Any]) -> str:
     to_encode = data.copy()
