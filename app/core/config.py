@@ -8,8 +8,9 @@ APP_DIR = Path(__file__).resolve().parent.parent  # ./backend/app/
 ROOT_DIR = APP_DIR.parent                         # ./backend/
 
 # Check if the app is running in a Docker container
-cgroup_file = Path('/proc/self/cgroup')
-is_docker_env = Path('/.dockerenv').exists() or (cgroup_file.is_file() and any('docker' in line for line in cgroup_file.open()))
+is_docker_env = Path('/.dockerenv').exists() or (
+    (cgroup_file := Path('/proc/self/cgroup')).is_file() and 'docker' in cgroup_file.read_text()
+)
 
 # Add default .env file and environment-specific .env file if it exists
 env_specific_file = ROOT_DIR / 'envs' / f'.env.{os.getenv('ENVIRONMENT')}'
