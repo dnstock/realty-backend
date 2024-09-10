@@ -1,19 +1,18 @@
 from pydantic import BaseModel, ConfigDict, EmailStr
-from typing import TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from schemas import PropertySchema
 
 class Base(BaseModel):
     name: str
     email: EmailStr
-    password: str
-    is_active: bool = True
+    is_active: Optional[bool] = None
 
 class Create(Base):
-    pass
+    password: str
 
 class Update(Base):
-    pass
+    password: Optional[str] = None
 
 class Read(Base):
     id: int
