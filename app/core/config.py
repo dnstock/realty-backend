@@ -118,14 +118,16 @@ class Settings(BaseSettings):
 
     # Adjust hostnames if running in Docker container
     @field_validator('postgres_host', 'redis_host', mode='before')
-    def adjust_hostnames(self, v: str) -> str:
+    @classmethod
+    def adjust_hostnames(cls, v: str) -> str:
         if v == 'localhost' and is_docker_env:
             return 'host.docker.internal'
         return v
 
     # Set the SQLAlchemy echo flag
     @field_validator('sqlalchemy_echo', mode='after')
-    def set_sqlalchemy_echo(self, v: bool | None, info: ValidationInfo) -> bool:
+    @classmethod
+    def set_sqlalchemy_echo(cls, v: bool | None, info: ValidationInfo) -> bool:
         values = info.data
         if values['postgres_debug_log_queries'] is None:
             # Default to True in development
@@ -136,19 +138,22 @@ class Settings(BaseSettings):
     
     # Uppercase the log levels
     @field_validator('log_level', 'log_level_file', 'log_level_console', mode='before')
-    def ensure_uppercase_log_levels(self, v: str | None, info: ValidationInfo) -> str:
+    @classmethod
+    def ensure_uppercase_log_levels(cls, v: str | None, info: ValidationInfo) -> str:
         values = info.data
         return values['log_level'].upper() if v is None else v.upper()
     
     # Set the log formats
     @field_validator('log_format', 'log_format_file', 'log_format_console', mode='after')
-    def set_log_formats(self, v: str | None, info: ValidationInfo) -> str:
+    @classmethod
+    def set_log_formats(cls, v: str | None, info: ValidationInfo) -> str:
         values = info.data
         return values['log_format'].lower() if v is None else v.lower()
     
     # Construct the database URLs
     @field_validator('postgres_url', 'postgres_test_url', mode='after')
-    def construct_database_urls(self, v: str | None, info: ValidationInfo) -> str:
+    @classmethod
+    def construct_database_urls(cls, v: str | None, info: ValidationInfo) -> str:
         values = info.data
         base_url = (
             f"postgresql://{values['postgres_user']}:{values['postgres_password']}"
@@ -160,7 +165,8 @@ class Settings(BaseSettings):
     
     # Construct the Redis URLs
     @field_validator('redis_db_url', 'redis_cache_url', mode='after')
-    def adjust_redis_host_and_url(self, v: str | None, info: ValidationInfo) -> str:
+    @classmethod
+    def adjust_redis_host_and_url(cls, v: str | None, info: ValidationInfo) -> str:
         values = info.data
         base_url = f'redis://{values["redis_host"]}:{values["redis_port"]}/'
         if info.field_name == 'redis_cache_url':
