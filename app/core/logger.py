@@ -74,9 +74,12 @@ if not logger.hasHandlers():
         logger.addHandler(smtp_handler)
 
 # Log exceptions
-async def log_exception(request: Request, exc: Exception) -> None:
+def log_exception(exc: Exception, occured_in: Optional[str]) -> None:
     logger.error(
-        f"Exception occurred in {request.url.path}: {exc}",
+        exc if occured_in is None else f"Exception occurred in {occured_in}: {exc}",
         exc_info=True,
         extra={"request_id": request_id_context.get()}
     )
+
+def log_middleware_exception(exc: Exception, request: Request) -> None:
+    log_exception(exc, request.url.path)

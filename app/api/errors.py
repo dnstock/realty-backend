@@ -2,11 +2,11 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from sqlalchemy.exc import IntegrityError
-from core.logger import log_exception
+from core.logger import log_middleware_exception
 
 def common_http_exception_handler(app: FastAPI) -> None:
     def handler(request: Request, exc: HTTPException) -> JSONResponse:
-        log_exception(request, exc)
+        log_middleware_exception(exc, request)
         return JSONResponse(
             status_code=exc.status_code,
             content={"detail": exc.detail},
@@ -15,7 +15,7 @@ def common_http_exception_handler(app: FastAPI) -> None:
 
 def common_validation_exception_handler(app: FastAPI) -> None:
     def handler(request: Request, exc: RequestValidationError) -> JSONResponse:
-        log_exception(request, exc)
+        log_middleware_exception(exc, request)
         return JSONResponse(
             status_code=422,
             content={"detail": exc.errors(), "body": exc.body},
@@ -24,7 +24,7 @@ def common_validation_exception_handler(app: FastAPI) -> None:
 
 def common_sqlalchemy_exception_handler(app: FastAPI) -> None:
     def handler(request: Request, exc: IntegrityError) -> JSONResponse:
-        log_exception(request, exc)
+        log_middleware_exception(exc, request)
         return JSONResponse(
             status_code=400,
             content={"detail": "Database integrity error occurred."},
@@ -33,7 +33,7 @@ def common_sqlalchemy_exception_handler(app: FastAPI) -> None:
 
 def common_unhandled_exception_handler(app: FastAPI) -> None:
     def handler(request: Request, exc: Exception) -> JSONResponse:
-        log_exception(request, exc)
+        log_middleware_exception(exc, request)
         return JSONResponse(
             status_code=500,
             content={"detail": "An unexpected server error occurred."},

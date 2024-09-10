@@ -5,6 +5,7 @@ from typing import Callable, Awaitable
 from uuid import uuid4
 from core import settings, request_id_context
 from db import SessionLocal, db_session_context
+from core.logger import log_middleware_exception
 
 # CORS settings for the API
 def cors_middleware(app: FastAPI) -> None:
@@ -34,9 +35,10 @@ class DBSessionMiddleware(BaseHTTPMiddleware):
             db_session_context.set(db)
             try:
                 response = await call_next(request)
-            except Exception as e:
+            except Exception as exc:
+                log_middleware_exception(exc, request)
                 db.rollback()  # Rollback any pending transactions
-                raise e
+                raise exc from exc
             finally:
                 db_session_context.set(None)
                 db.close()

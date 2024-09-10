@@ -1,7 +1,7 @@
 from sqlalchemy.exc import NoResultFound, MultipleResultsFound, IntegrityError
 from pydantic import BaseModel
 from typing import Type, TypeVar, Optional, List
-from core import logger
+from core.logger import log_exception
 from db import Base, get_db
 
 ## HEIRARCHY OF RESOURCES
@@ -16,9 +16,11 @@ def get_by_id(model: 'Type[T]', id: int) -> 'Optional[T]':
     db = get_db()
     try:
         return db.query(model).filter(getattr(model, 'id') == id).one()
-    except NoResultFound:
+    except NoResultFound as exc:
+        log_exception(exc, f"No record found for id {id}")
         return None
-    except MultipleResultsFound:
+    except MultipleResultsFound as exc:
+        log_exception(exc, f"Multiple records found for id {id}")
         return None
 
 def get_all(model: Type[T], parent_key: str, parent_value: int, skip: int = 0, limit: int = 10) -> List[T]:
@@ -34,13 +36,13 @@ def create_and_commit(model: Type[T], schema: BaseModel, parent_key: str, parent
         db.commit()
         db.refresh(db_obj)
         return db_obj
-    except IntegrityError as e:
+    except IntegrityError as exc:
+        log_exception(exc, "Database integrity error occurred")
         db.rollback()
-        logger.error(f"IntegrityError: {e}")
         return None
-    except Exception as e:
+    except Exception as exc:
+        log_exception(exc, "An error occurred")
         db.rollback()
-        logger.error(f"An error occurred: {e}")
         return None
 
 def update_and_commit(model: Type[T], schema: BaseModel, id: int) -> Optional[T]:
@@ -58,17 +60,17 @@ def update_and_commit(model: Type[T], schema: BaseModel, id: int) -> Optional[T]
         db.commit()
         db.refresh(db_obj)
         return db_obj
-    except NoResultFound:
-        logger.error(f"NoResultFound: No record found for id {id}")
+    except NoResultFound as exc:
+        log_exception(exc, f"No record found for id {id}")
         return None
-    except MultipleResultsFound:
-        logger.error(f"MultipleResultsFound: Multiple records found for id {id}")
+    except MultipleResultsFound as exc:
+        log_exception(exc, f"Multiple records found for id {id}")
         return None
-    except IntegrityError as e:
+    except IntegrityError as exc:
+        log_exception(exc, "Database integrity error occurred.")
         db.rollback()
-        logger.error(f"IntegrityError: {e}")
         return None
-    except Exception as e:
+    except Exception as exc:
+        log_exception(exc, "An error occurred")
         db.rollback()
-        logger.error(f"An error occurred: {e}")
         return None

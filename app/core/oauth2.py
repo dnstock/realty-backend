@@ -6,6 +6,7 @@ from jose import JWTError, jwt
 from core import settings
 from schemas import UserSchema
 from controllers import UserController
+from core.logger import log_exception
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
@@ -28,8 +29,9 @@ def verify_token(token: str, credentials_exception: HTTPException) -> UserSchema
         email: Optional[str] = payload.get("sub")
         if email is None:
             raise credentials_exception
-    except JWTError:
-        raise credentials_exception
+    except JWTError as exc:
+        log_exception(exc, "Error decoding token")
+        raise credentials_exception from exc
     user = UserController.get_by_email(email=email)
     if user is None:
         raise credentials_exception

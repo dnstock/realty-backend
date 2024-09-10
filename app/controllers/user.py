@@ -3,6 +3,7 @@ from sqlalchemy.sql.expression import and_
 from sqlalchemy.sql import exists
 from sqlalchemy.exc import NoResultFound, MultipleResultsFound
 from core import logger, security
+from core.logger import log_exception
 from schemas import UserSchema
 from db.models import User
 from db import models, get_db
@@ -36,9 +37,9 @@ def create_and_commit(schema: UserSchema.Create) -> Optional[User]:
         db.commit()
         db.refresh(db_obj)
         return db_obj
-    except Exception as e:
+    except Exception as exc:
+        log_exception(exc, "Error creating user")
         db.rollback()
-        logger.error(f"Error creating user: {e}")
         return None
 
 def update_and_commit(schema: UserSchema.Update, id: int) -> Optional[User]:
@@ -52,15 +53,15 @@ def update_and_commit(schema: UserSchema.Update, id: int) -> Optional[User]:
         db.commit()
         db.refresh(user)
         return user
-    except NoResultFound:
-        logger.error(f"No user found with id: {id}")
+    except NoResultFound as exc:
+        log_exception(exc, f"No record found for id {id}")
         return None
-    except MultipleResultsFound:
-        logger.error(f"Multiple users found with id: {id}")
+    except MultipleResultsFound as exc:
+        log_exception(exc, f"Multiple records found for id {id}")
         return None
-    except Exception as e:
+    except Exception as exc:
+        log_exception(exc, "Error updating user")
         db.rollback()
-        logger.error(f"Error updating user: {e}")
         return None
     
 def validate_ownership(current_user: UserSchema.Read, model_name: str, resource_id: int) -> bool:
@@ -91,9 +92,9 @@ def validate_ownership(current_user: UserSchema.Read, model_name: str, resource_
         
         return True
     
-    except AttributeError as e:
-        logger.error(f"Attribute error during ownership validation: {str(e)}")
+    except AttributeError as exc:
+        log_exception(exc, "Attribute error during ownership validation")
         return False
-    except Exception as e:
-        logger.error(f"An unexpected error occurred: {str(e)}")
+    except Exception as exc:
+        log_exception(exc, "Error during ownership validation")
         return False
