@@ -1,9 +1,9 @@
 '''
 Custom data type definitions for SQLAlchemy
 '''
+from typing import Optional
 from sqlalchemy import TypeDecorator, Integer
 from sqlalchemy.engine import Dialect
-from typing import Optional
 
 # Custom data type for boolean stored as integer
 class BooleanInteger(TypeDecorator[int]):

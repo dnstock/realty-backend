@@ -1,8 +1,7 @@
-from typing import Optional, List
+from typing import Optional, List, Callable
 from sqlalchemy.sql.expression import and_
 from sqlalchemy.sql import exists
 from sqlalchemy.exc import NoResultFound, MultipleResultsFound
-from typing import Callable
 from core import logger, security
 from schemas import UserSchema
 from db.models import User

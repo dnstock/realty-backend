@@ -1,11 +1,11 @@
 import logging
 import json
-from logging.handlers import RotatingFileHandler, SMTPHandler
-from fastapi import Request
 from pathlib import Path
-from core import settings
 from typing import Optional
 from contextvars import ContextVar
+from logging.handlers import RotatingFileHandler, SMTPHandler
+from fastapi import Request
+from core import settings
 
 # Request ID for correlating logs to a single request
 request_id_context: ContextVar[Optional[str]] = ContextVar("request_id", default=None)

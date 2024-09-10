@@ -1,8 +1,8 @@
+import os
+from pathlib import Path
+from typing import Optional, Literal
 from pydantic import Field, field_validator, ValidationInfo
 from pydantic_settings import BaseSettings
-from typing import Optional, Literal
-from pathlib import Path
-import os
 
 APP_DIR = Path(__file__).resolve().parent.parent  # ./backend/app/
 ROOT_DIR = APP_DIR.parent                         # ./backend/
