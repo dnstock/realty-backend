@@ -13,6 +13,11 @@ class Create(Base):
 
 class Update(Base):
     password: Optional[str] = None
+    
+class Login(Base):
+    pass
+
+    model_config = ConfigDict(from_attributes=True)
 
 class Read(Base):
     id: int
