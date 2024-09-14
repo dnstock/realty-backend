@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional, Any
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from core import settings
@@ -37,10 +37,17 @@ def verify_token(token: str, credentials_exception: HTTPException) -> UserSchema
         raise credentials_exception
     return UserSchema.Read.model_validate(user)
 
-def get_current_user(token: str = Depends(oauth2_scheme)) -> UserSchema.Read:
+def get_current_user(request: Request) -> UserSchema.Read:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    
+    # Get the access token from the cookies
+    token = request.cookies.get('access_token')
+    if not token:
+        raise credentials_exception
+    
+    # Verify the token
     return verify_token(token, credentials_exception)
