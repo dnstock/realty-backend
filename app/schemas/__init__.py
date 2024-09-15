@@ -7,11 +7,9 @@ from . import (
     lease as LeaseSchema,
     tenant as TenantSchema,
     insurance as InsuranceSchema,
-    token as TokenSchema,
 )
 
 __all__ = [
-    "TokenSchema",
     "UserSchema",
     "BuildingSchema",
     "UnitSchema",
