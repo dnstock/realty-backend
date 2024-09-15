@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request, Response
 from fastapi.security import OAuth2PasswordRequestForm
+from core.oauth2 import create_and_set_token_cookie, get_current_user, delete_token_cookies
 from core.security import verify_password
-from core.oauth2 import create_and_set_token_cookie, get_current_user
+from core.logger import log_exception
 from controllers import UserController
 from schemas import UserSchema
 
@@ -22,12 +23,17 @@ def login_for_access_token(response: Response, form_data: OAuth2PasswordRequestF
 
 @router.post('/logout', response_model=dict)
 def logout(response: Response):
-    response.delete_cookie(key="access_token", httponly=True)
-    response.delete_cookie(key="refresh_token", httponly=True)
+    delete_token_cookies(response)
     return {"message": "Logout successful"}
 
 # Return current user info and refresh access token if expired
-@router.get('/me', response_model=UserSchema.Me)
+@router.get('/me', response_model=UserSchema.Me | None)
 def get_user_info(request: Request, response: Response):
-    user = get_current_user(request=request, response=response)
-    return user
+    if not request.cookies.get('access_token'):
+        return None
+    try:
+        return get_current_user(request=request, response=response)
+    except HTTPException as exc:
+        log_exception(exc, "Error getting current user")
+        delete_token_cookies(response)
+        return None

@@ -31,6 +31,10 @@ def set_token_cookie(response: Response, token_type: Literal['access', 'refresh'
         secure=settings.app_env == 'DEVELOPMENT',  # Set to False if not using HTTPS, but keep True in production
         samesite='lax'
     )
+    
+def delete_token_cookies(response: Response) -> None:
+    response.delete_cookie(key="access_token", httponly=True)
+    response.delete_cookie(key="refresh_token", httponly=True)
 
 def create_and_set_token_cookie(response: Response, token_type: Literal['access', 'refresh'], data: dict[str, Any]) -> str:
     token = create_token(data=data, token_type=token_type)
