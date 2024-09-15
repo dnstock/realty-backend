@@ -1,7 +1,7 @@
 import logging
 import json
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Any
 from contextvars import ContextVar
 from logging.handlers import RotatingFileHandler, SMTPHandler
 from fastapi import Request
@@ -39,7 +39,7 @@ text_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(m
 # JSON formatter for structured logging
 class JsonFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
-        log_record = {
+        log_record: dict[str, Any] = {
             'timestamp': self.formatTime(record),
             'level': record.levelname,
             'message': record.getMessage(),
