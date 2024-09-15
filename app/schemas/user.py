@@ -14,7 +14,7 @@ class Create(Base):
 class Update(Base):
     password: Optional[str] = None
     
-class Login(Base):
+class Me(Base):  # User details returned to the client (e.g. after login)
     pass
 
     model_config = ConfigDict(from_attributes=True)
