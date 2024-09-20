@@ -14,6 +14,7 @@ class Create(Base):
 
 class Update(Base):
     password: Optional[str] = None
+    id: int
     
 class Me(Base):  # User details returned to the client (e.g. after login)
     pass

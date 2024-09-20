@@ -14,7 +14,7 @@ class Create(Base):
     pass
 
 class Update(Base):
-    pass
+    id: int
 
 class Read(Base):
     id: int
