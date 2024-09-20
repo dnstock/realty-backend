@@ -19,3 +19,5 @@ class Read(Base):
     id: int
     tenant: 'TenantSchema.Read'
 
+class ReadFull(Read):
+    pass

@@ -19,5 +19,6 @@ class Update(Base):
 class Read(Base):
     id: int
     lease: 'LeaseSchema.Read'
-    insurances: list['InsuranceSchema.Read'] = []
 
+class ReadFull(Read):
+    insurances: list['InsuranceSchema.Read'] = Field(default_factory=list)

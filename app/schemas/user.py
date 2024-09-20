@@ -22,5 +22,6 @@ class Me(Base):  # User details returned to the client (e.g. after login)
 
 class Read(Base):
     id: int
-    properties: list['PropertySchema.Read'] = []
 
+class ReadFull(Read):
+    properties: list['PropertySchema.Read'] = Field(default_factory=list)

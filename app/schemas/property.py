@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING
+from pydantic import Field, constr, field_validator
 from . import BaseConfigModel
 if TYPE_CHECKING:
     from schemas import UserSchema, BuildingSchema
@@ -19,5 +20,6 @@ class Update(Base):
 class Read(Base):
     id: int
     manager: 'UserSchema.Read'
-    buildings: list['BuildingSchema.Read'] = []
 
+class ReadFull(Read):
+    buildings: list['BuildingSchema.Read'] = Field(default_factory=list)

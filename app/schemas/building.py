@@ -1,3 +1,4 @@
+from pydantic import Field, StrictInt
 from . import BaseConfigModel
 if TYPE_CHECKING:
     from schemas import PropertySchema, UnitSchema
@@ -15,5 +16,6 @@ class Update(Base):
 class Read(Base):
     id: int
     property: 'PropertySchema.Read'
-    units: list['UnitSchema.Read'] = []
 
+class ReadFull(Read):
+    units: list['UnitSchema.Read'] = Field(default_factory=list)

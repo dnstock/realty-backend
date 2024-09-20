@@ -1,3 +1,4 @@
+from pydantic import Field
 from datetime import date
 from . import BaseConfigModel
 from typing import TYPE_CHECKING
@@ -18,5 +19,6 @@ class Update(Base):
 class Read(Base):
     id: int
     unit: 'UnitSchema.Read'
-    tenants: list['TenantSchema.Read'] = []
 
+class ReadFull(Read):
+    tenants: list['TenantSchema.Read'] = Field(default_factory=list)
