@@ -1,10 +1,10 @@
-from pydantic import BaseModel, ConfigDict, EmailStr
-from typing import Optional
-from typing import TYPE_CHECKING
+from pydantic import EmailStr, Field
+from . import BaseConfigModel
+from typing import TYPE_CHECKING, Optional
 if TYPE_CHECKING:
     from schemas import LeaseSchema, InsuranceSchema
 
-class Base(BaseModel):
+class Base(BaseConfigModel):
     name: str
     email: Optional[EmailStr] = None
     phone: Optional[str] = None
@@ -21,4 +21,3 @@ class Read(Base):
     lease: 'LeaseSchema.Read'
     insurances: list['InsuranceSchema.Read'] = []
 
-    model_config = ConfigDict(from_attributes=True)

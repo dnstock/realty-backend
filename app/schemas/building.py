@@ -1,9 +1,8 @@
-from pydantic import BaseModel, ConfigDict
-from typing import TYPE_CHECKING
+from . import BaseConfigModel
 if TYPE_CHECKING:
     from schemas import PropertySchema, UnitSchema
 
-class Base(BaseModel):
+class Base(BaseConfigModel):
     name: str
     property_id: int
 
@@ -18,4 +17,3 @@ class Read(Base):
     property: 'PropertySchema.Read'
     units: list['UnitSchema.Read'] = []
 
-    model_config = ConfigDict(from_attributes=True)

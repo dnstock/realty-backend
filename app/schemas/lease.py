@@ -1,10 +1,10 @@
-from pydantic import BaseModel, ConfigDict
 from datetime import date
+from . import BaseConfigModel
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from schemas import UnitSchema, TenantSchema
 
-class Base(BaseModel):
+class Base(BaseConfigModel):
     start_date: date
     end_date: date
     unit_id: int
@@ -20,4 +20,3 @@ class Read(Base):
     unit: 'UnitSchema.Read'
     tenants: list['TenantSchema.Read'] = []
 
-    model_config = ConfigDict(from_attributes=True)

@@ -1,9 +1,9 @@
-from pydantic import BaseModel, ConfigDict
 from typing import TYPE_CHECKING
+from . import BaseConfigModel
 if TYPE_CHECKING:
     from schemas import UserSchema, BuildingSchema
 
-class Base(BaseModel):
+class Base(BaseConfigModel):
     address: str
     city: str
     state: str
@@ -21,4 +21,3 @@ class Read(Base):
     manager: 'UserSchema.Read'
     buildings: list['BuildingSchema.Read'] = []
 
-    model_config = ConfigDict(from_attributes=True)

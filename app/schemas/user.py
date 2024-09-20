@@ -1,9 +1,10 @@
-from pydantic import BaseModel, ConfigDict, EmailStr
 from typing import Optional, TYPE_CHECKING
+from pydantic import EmailStr, Field
+from . import BaseConfigModel
 if TYPE_CHECKING:
     from schemas import PropertySchema
 
-class Base(BaseModel):
+class Base(BaseConfigModel):
     name: str
     email: EmailStr
     is_active: Optional[bool] = None
@@ -23,4 +24,3 @@ class Read(Base):
     id: int
     properties: list['PropertySchema.Read'] = []
 
-    model_config = ConfigDict(from_attributes=True)
