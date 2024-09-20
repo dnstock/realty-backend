@@ -1,10 +1,12 @@
 from pydantic import Field, StrictInt
 from . import BaseConfigModel
+from typing import TYPE_CHECKING, Annotated
 if TYPE_CHECKING:
     from schemas import PropertySchema, UnitSchema
 
 class Base(BaseConfigModel):
     name: str
+    unit_count: Annotated[StrictInt, Field(gt=0)]
     property_id: int
 
 class Create(Base):

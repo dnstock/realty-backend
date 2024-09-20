@@ -10,6 +10,7 @@ class Building(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String, index=True)
+    unit_count: Mapped[int] = mapped_column(Integer, index=True)
     property_id: Mapped[int] = mapped_column(ForeignKey("properties.id"))
 
     property: Mapped["Property"] = relationship("Property", back_populates="buildings")
