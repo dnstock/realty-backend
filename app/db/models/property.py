@@ -9,10 +9,12 @@ class Property(Base):
     __tablename__ = "properties"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String, index=True)
     address: Mapped[str] = mapped_column(String, index=True)
     city: Mapped[str] = mapped_column(String, index=True)
     state: Mapped[str] = mapped_column(String, index=True)
     zip_code: Mapped[str] = mapped_column(String, index=True)
+    type: Mapped[str] = mapped_column(String, index=True)
     manager_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
 
     manager: Mapped["User"] = relationship("User", back_populates="properties")
