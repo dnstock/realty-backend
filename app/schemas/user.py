@@ -1,6 +1,6 @@
-from typing import Optional, TYPE_CHECKING
 from pydantic import EmailStr, Field
 from . import BaseConfigModel
+from typing import TYPE_CHECKING, Optional, Annotated
 if TYPE_CHECKING:
     from schemas import PropertySchema
 
@@ -8,19 +8,14 @@ class Base(BaseConfigModel):
     name: str
     email: EmailStr
     is_active: Optional[bool] = None
-
-class Create(Base):
-    password: str
-
-class Update(Base):
-    password: Optional[str] = None
-    id: int
+    password: Annotated[str, Field(exclude=True)]  # Exclude from serialization
     
-class Me(Base):  # User details returned to the client (e.g. after login)
+class Create(Base):
     pass
 
-    model_config = ConfigDict(from_attributes=True)
-
+class Update(Base):
+    id: int
+    
 class Read(Base):
     id: int
 

@@ -8,7 +8,7 @@ from schemas import UserSchema
 
 router: APIRouter = APIRouter()
 
-@router.post('/login', response_model=UserSchema.Me)
+@router.post('/login', response_model=UserSchema.Read)
 def login_for_access_token(response: Response, form_data: OAuth2PasswordRequestForm = Depends()):
     user = UserController.get_by_email(email=form_data.username)
     if not user or not verify_password(plain_password=form_data.password, hashed_password=user.password):
@@ -27,7 +27,7 @@ def logout(response: Response):
     return {"message": "Logout successful"}
 
 # Return current user info and refresh access token if expired
-@router.get('/me', response_model=UserSchema.Me | None)
+@router.get('/me', response_model=UserSchema.Read | None)
 def get_user_info(request: Request, response: Response):
     if not request.cookies.get('access_token'):
         return None
