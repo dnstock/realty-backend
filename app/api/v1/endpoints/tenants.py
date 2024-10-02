@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from controllers import TenantController, InsuranceController
-from schemas import TenantSchema, InsuranceSchema
-# from app.api.v1.deps import validate_ownership
+from schemas import BaseSchema, TenantSchema, InsuranceSchema
+from app.api.v1.deps import serialize_results
 
 router: APIRouter = APIRouter()
 
@@ -26,10 +26,10 @@ def create_insurance(
 ):
     return InsuranceController.create_and_commit(schema=insurance, parent_id=tenant_id)
 
-@router.get("/{tenant_id}/insurances/", response_model=list[InsuranceSchema.Read])
+@router.get("/{tenant_id}/insurances/", response_model=BaseSchema.PaginatedResults)
 def read_insurances(
     tenant_id: int, skip: int = 0, limit: int = 10, 
     # _ = Depends(lambda: validate_ownership(model_name="Tenant", resource_id=tenant_id))
 ):
-    return InsuranceController.get_all(parent_id=tenant_id, skip=skip, limit=limit)
-
+    results = InsuranceController.get_all_paginated(parent_id=tenant_id, skip=skip, limit=limit)
+    return serialize_results(results, InsuranceSchema.Read)

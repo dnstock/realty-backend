@@ -1,4 +1,5 @@
 from . import (
+    base as BaseController,
     user as UserController,
     property as PropertyController,
     building as BuildingController,
@@ -9,6 +10,7 @@ from . import (
 )
 
 __all__ = [
+    "BaseController",
     "UserController",
     "PropertyController",
     "BuildingController",

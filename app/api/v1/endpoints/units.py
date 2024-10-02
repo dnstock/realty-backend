@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from controllers import UnitController, LeaseController
-from schemas import UnitSchema, LeaseSchema
-# from app.api.v1.deps import validate_ownership
+from schemas import BaseSchema, UnitSchema, LeaseSchema
+from app.api.v1.deps import serialize_results
 
 router: APIRouter = APIRouter()
 
@@ -26,9 +26,10 @@ def create_lease(
 ):
     return LeaseController.create_and_commit(schema=lease, parent_id=unit_id)
 
-@router.get("/{unit_id}/leases/", response_model=list[LeaseSchema.Read])
+@router.get("/{unit_id}/leases/", response_model=BaseSchema.PaginatedResults)
 def read_leases(
     unit_id: int, skip: int = 0, limit: int = 10, 
     # _ = Depends(lambda: validate_ownership(model_name="Unit", resource_id=unit_id))
 ):
-    return LeaseController.get_all(parent_id=unit_id, skip=skip, limit=limit)
+    results = LeaseController.get_all_paginated(parent_id=unit_id, skip=skip, limit=limit)
+    return serialize_results(results, LeaseSchema.Read)

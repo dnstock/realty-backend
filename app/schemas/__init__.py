@@ -1,14 +1,6 @@
-from pydantic import BaseModel, ConfigDict
-class BaseConfigModel(BaseModel):
-    model_config = ConfigDict(
-        from_attributes = True,
-        validate_assignment = True,
-        str_strip_whitespace = True,
-        str_min_length = 1,
-    )
-
 # User -> Property -> Building -> Unit -> Lease -> Tenant -> Insurance
 from . import (
+    base as BaseSchema,
     user as UserSchema,
     property as PropertySchema,
     building as BuildingSchema,
@@ -19,6 +11,7 @@ from . import (
 )
 
 __all__ = [
+    "BaseSchema",
     "UserSchema",
     "BuildingSchema",
     "UnitSchema",

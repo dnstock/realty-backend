@@ -1,5 +1,5 @@
 from pydantic import Field
-from . import BaseConfigModel
+from schemas.base import BaseConfigModel
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from schemas import BuildingSchema, LeaseSchema

@@ -1,5 +1,5 @@
 from pydantic import Field, StrictInt
-from . import BaseConfigModel
+from schemas.base import BaseConfigModel
 from typing import TYPE_CHECKING, Annotated
 if TYPE_CHECKING:
     from schemas import PropertySchema, UnitSchema

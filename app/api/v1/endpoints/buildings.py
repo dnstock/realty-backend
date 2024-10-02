@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from controllers import BuildingController, UnitController
-from schemas import BuildingSchema, UnitSchema
-# from app.api.v1.deps import get_current_active_user
+from schemas import BaseSchema, BuildingSchema, UnitSchema
+from app.api.v1.deps import serialize_results
 
 router: APIRouter = APIRouter()
 
@@ -26,9 +26,10 @@ def create_unit(
 ):
     return UnitController.create_and_commit(schema=unit, parent_id=building_id)
 
-@router.get("/{building_id}/units/", response_model=list[UnitSchema.Read])
+@router.get("/{building_id}/units/", response_model=BaseSchema.PaginatedResults)
 def read_units(
     building_id: int, skip: int = 0, limit: int = 10, 
     # _ = Depends(lambda: validate_ownership(model_name="Building", resource_id=building_id))
 ):
-    return UnitController.get_all(parent_id=building_id, skip=skip, limit=limit)
+    results = UnitController.get_all_paginated(parent_id=building_id, skip=skip, limit=limit)
+    return serialize_results(results, UnitSchema.Read)

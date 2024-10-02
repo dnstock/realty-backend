@@ -1,8 +1,9 @@
 from sqlalchemy.exc import NoResultFound, MultipleResultsFound, IntegrityError
 from pydantic import BaseModel
-from typing import Type, TypeVar, Optional, List
+from typing import Type, TypeVar, Optional
 from core.logger import log_exception
 from db import Base, get_db
+from schemas.base import PaginatedResults, AllResults
 
 ## HEIRARCHY OF RESOURCES
 # Manager -> Property -> Building -> Unit -> Lease -> Tenant -> Insurance
@@ -23,9 +24,19 @@ def get_by_id(model: Type[T], id: int) -> Optional[T]:
         log_exception(exc, f"Multiple records found for id {id}")
         return None
 
-def get_all(model: Type[T], parent_key: str, parent_value: int, skip: int = 0, limit: int = 10) -> List[T]:
+def get_all(model: Type[T], parent_key: str, parent_value: int) -> AllResults:
     db = get_db()
-    return db.query(model).filter(getattr(model, parent_key) == parent_value).offset(skip).limit(limit).all()
+    query = db.query(model).filter(getattr(model, parent_key) == parent_value)
+    totalCount = query.count()
+    rows = query.all()
+    return AllResults(rows=rows, totalCount=totalCount)
+
+def get_all_paginated(model: Type[T], parent_key: str, parent_value: int, skip: int = 0, limit: int = 10) -> PaginatedResults:
+    db = get_db()
+    query = db.query(model).filter(getattr(model, parent_key) == parent_value)
+    totalCount = query.count()
+    rows = query.offset(skip).limit(limit).all()
+    return PaginatedResults(rows=rows, totalCount=totalCount, pageStart=min(skip, totalCount), pageEnd=min(skip + limit, totalCount))
 
 def create_and_commit(model: Type[T], schema: BaseModel, parent_key: str, parent_value: int) -> Optional[T]:
     db = get_db()
