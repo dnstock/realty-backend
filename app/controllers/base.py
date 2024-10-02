@@ -12,7 +12,7 @@ from db import Base, get_db
 # Define a generic type for models
 T = TypeVar('T', bound=Base)
 
-def get_by_id(model: 'Type[T]', id: int) -> 'Optional[T]':
+def get_by_id(model: Type[T], id: int) -> Optional[T]:
     db = get_db()
     try:
         return db.query(model).filter(getattr(model, 'id') == id).one()
