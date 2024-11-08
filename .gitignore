@@ -18,6 +18,7 @@
 
 # Local development logs
 *.log
+*.log.*
 
 # macOS
 .DS_Store
