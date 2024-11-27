@@ -1,14 +1,19 @@
-from pydantic import EmailStr, Field
+from pydantic import EmailStr, Field, field_validator
 from schemas.base import BaseModel, BaseModelWithId
 from typing import TYPE_CHECKING
+from core import security
 if TYPE_CHECKING:
     from schemas import PropertySchema
 
 class Base(BaseModel):
     name: str
     email: EmailStr
-    password: str = Field(exclude=True)  # Non-serializable
     is_active: bool | None = None
+    password: str
+
+    @field_validator('password')
+    def hashed_password(cls, password: str) -> str:
+        return security.get_password_hash(password)
 
 class Create(Base):
     pass
@@ -17,7 +22,7 @@ class Update(Base, BaseModelWithId):
     pass
 
 class Read(Base, BaseModelWithId):
-    pass
+    password: str = Field(exclude=True)
 
 class ReadFull(Read):
     properties: list['PropertySchema.Read'] = Field(default_factory=list)

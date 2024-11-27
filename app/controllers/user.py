@@ -2,7 +2,6 @@ from typing import Any
 from sqlalchemy.sql.expression import and_
 from sqlalchemy.sql import exists
 from sqlalchemy.exc import NoResultFound, MultipleResultsFound
-from core import security
 from core.logger import log_exception
 from schemas import UserSchema
 from db.models import User
@@ -46,7 +45,6 @@ def get_all_paginated(db: Session, skip: int = 0, limit: int = 10) -> PaginatedR
 def create_and_commit(db: Session, schema: UserSchema.Create) -> User | None:
     try:
         db_obj = User(**schema.model_dump())
-        setattr(db_obj, 'password', security.get_password_hash(schema.password))
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
@@ -60,8 +58,6 @@ def update_and_commit(db: Session, schema: UserSchema.Update) -> User | None:
     try:
         user = db.query(User).filter(User.id == schema.id).one()
         for key, value in schema.model_dump().items():
-            if key == 'password':
-                value = security.get_password_hash(value)
             setattr(user, key, value)
         db.commit()
         db.refresh(user)
