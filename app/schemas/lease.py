@@ -1,11 +1,11 @@
 from pydantic import Field
 from datetime import date
-from schemas.base import BaseConfigModel
+from schemas.base import BaseModel, BaseModelWithId
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from schemas import UnitSchema, TenantSchema
 
-class Base(BaseConfigModel):
+class Base(BaseModel):
     start_date: date
     end_date: date
     unit_id: int
@@ -13,11 +13,10 @@ class Base(BaseConfigModel):
 class Create(Base):
     pass
 
-class Update(Base):
-    id: int
+class Update(Base, BaseModelWithId):
+    pass
 
-class Read(Base):
-    id: int
+class Read(Base, BaseModelWithId):
     unit: 'UnitSchema.Read'
 
 class ReadFull(Read):

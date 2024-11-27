@@ -1,10 +1,10 @@
 from pydantic import Field, constr, field_validator
-from schemas.base import BaseConfigModel
+from schemas.base import BaseModel, BaseModelWithId
 from typing import TYPE_CHECKING, Annotated, Literal, Optional
 if TYPE_CHECKING:
     from schemas import UserSchema, BuildingSchema
 
-class Base(BaseConfigModel):
+class Base(BaseModel):
     name: str
     address: str
     city: str
@@ -24,11 +24,10 @@ class Base(BaseConfigModel):
 class Create(Base):
     pass
 
-class Update(Base):
-    id: int
+class Update(Base, BaseModelWithId):
+    pass
 
-class Read(Base):
-    id: int
+class Read(Base, BaseModelWithId):
     manager: 'UserSchema.Read'
 
 class ReadFull(Read):

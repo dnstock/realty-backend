@@ -15,4 +15,4 @@ def create_and_commit(db: Session, schema: BuildingSchema.Create, parent_id: int
     return base.create_and_commit(db=db, model=Building, schema=schema, parent_key='property_id', parent_value=parent_id)
 
 def update_and_commit(db: Session, schema: BuildingSchema.Update, id: int) -> Optional[Building]:
-    return base.update_and_commit(db=db, model=Building, schema=schema, id=id)
+    return base.update_and_commit(db=db, model=Building, schema=schema)

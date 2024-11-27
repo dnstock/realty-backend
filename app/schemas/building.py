@@ -1,10 +1,10 @@
 from pydantic import Field, StrictInt
-from schemas.base import BaseConfigModel
+from schemas.base import BaseModel, BaseModelWithId
 from typing import TYPE_CHECKING, Annotated
 if TYPE_CHECKING:
     from schemas import PropertySchema, UnitSchema
 
-class Base(BaseConfigModel):
+class Base(BaseModel):
     name: str
     unit_count: Annotated[StrictInt, Field(gt=0)]
     property_id: int
@@ -12,11 +12,10 @@ class Base(BaseConfigModel):
 class Create(Base):
     pass
 
-class Update(Base):
-    id: int
+class Update(Base, BaseModelWithId):
+    pass
 
-class Read(Base):
-    id: int
+class Read(Base, BaseModelWithId):
     property: 'PropertySchema.Read'
 
 class ReadFull(Read):

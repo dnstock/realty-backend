@@ -1,10 +1,10 @@
 from pydantic import EmailStr, Field
-from schemas.base import BaseConfigModel
+from schemas.base import BaseModel, BaseModelWithId
 from typing import TYPE_CHECKING, Optional
 if TYPE_CHECKING:
     from schemas import LeaseSchema, InsuranceSchema
 
-class Base(BaseConfigModel):
+class Base(BaseModel):
     name: str
     email: Optional[EmailStr] = None
     phone: Optional[str] = None
@@ -13,11 +13,10 @@ class Base(BaseConfigModel):
 class Create(Base):
     pass
 
-class Update(Base):
-    id: int
+class Update(Base, BaseModelWithId):
+    pass
 
-class Read(Base):
-    id: int
+class Read(Base, BaseModelWithId):
     lease: 'LeaseSchema.Read'
 
 class ReadFull(Read):

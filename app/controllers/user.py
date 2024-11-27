@@ -56,9 +56,9 @@ def create_and_commit(db: Session, schema: UserSchema.Create) -> Optional[User]:
         db.rollback()
         return None
 
-def update_and_commit(db: Session, schema: UserSchema.Update, id: int) -> Optional[User]:
+def update_and_commit(db: Session, schema: UserSchema.Update) -> Optional[User]:
     try:
-        user = db.query(User).filter(User.id == id).one()
+        user = db.query(User).filter(User.id == schema.id).one()
         for key, value in schema.model_dump().items():
             if key == 'password':
                 value = security.get_password_hash(value)
