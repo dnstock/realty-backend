@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Optional, Literal
+from typing import Literal
 from pydantic import Field, field_validator, ValidationInfo
 from pydantic_settings import BaseSettings
 
@@ -37,7 +37,7 @@ class Settings(BaseSettings):
     postgres_pool_size: int = Field(10, description='Postgres database pool size')
     postgres_max_overflow: int = Field(20, description='Postgres database max overflow')
     postgres_pool_timeout: int = Field(30, description='Postgres database pool timeout')
-    postgres_debug_log_queries: Optional[bool] = Field(None, description='Log SQL queries for debugging')
+    postgres_debug_log_queries: bool | None = Field(None, description='Log SQL queries for debugging')
     postgres_url: str = ''
     postgres_test_url: str = ''
     sqlalchemy_future: bool = True  # Use the latest features and deprecations
@@ -53,7 +53,7 @@ class Settings(BaseSettings):
 
     # API Configuration
     api_cors_origins: list[str] = Field(..., description='List of allowed origins')
-    api_v1_cors_origins: Optional[list[str]] = Field(None, description='List of allowed origins specific for v1 API')
+    api_v1_cors_origins: list[str] | None = Field(None, description='List of allowed origins specific for v1 API')
 
     # Redis or Cache Configuration
     redis_host: str = Field(..., description='Redis server hostname or IP address')
@@ -64,29 +64,29 @@ class Settings(BaseSettings):
     redis_cache_url: str = ''
 
     # Email Configuration
-    smtp_server: Optional[str] = Field(None, description='Email host')
-    smtp_port: Optional[str] = Field(None, description='Email port')
-    smtp_user: Optional[str] = Field(None, description='Email user')
-    smtp_password: Optional[str] = Field(None, description='Email password')
+    smtp_server: str | None = Field(None, description='Email host')
+    smtp_port: str | None = Field(None, description='Email port')
+    smtp_user: str | None = Field(None, description='Email user')
+    smtp_password: str | None = Field(None, description='Email password')
 
     # Logging Configuration
     log_dir: str = Field('logs', description='The log directory of the application')
     log_file: str = Field('app.log', description='The log file of the application')
     log_level: str = Field('INFO', description='The log level of the application')
-    log_level_file: Optional[str] = Field(None, description='The log level for the log file (optional)')
-    log_level_console: Optional[str] = Field(None, description='The log level for the console (optional)')
+    log_level_file: str | None = Field(None, description='The log level for the log file (optional)')
+    log_level_console: str | None = Field(None, description='The log level for the console (optional)')
     log_max_files: int = Field(5, description='The max log files to store')
     log_max_file_size_bytes: int = Field(5242880, description='The max file size in bytes for each log file')
     log_format: Literal['text', 'json'] = Field('text', description='The log formatter to use (text or json)')
-    log_format_file: Optional[Literal['text', 'json']] = Field(None, description='The log formatter for the log file (optional)')
-    log_format_console: Optional[Literal['text', 'json']] = Field(None, description='The log formatter for the console (optional)')
+    log_format_file: Literal['text', 'json'] | None = Field(None, description='The log formatter for the log file (optional)')
+    log_format_console: Literal['text', 'json'] | None = Field(None, description='The log formatter for the console (optional)')
 
     # Alerts Configuration
     alerts_email_enabled: bool = Field(False, description='Enable email alerts')
-    alerts_email_from: Optional[str] = Field(None, description='Email address to send alerts from')
-    alerts_email_to: Optional[str] = Field(None, description='Email address to send alerts to')
-    alerts_sms_enabled: Optional[bool] = Field(False, description='Enable SMS alerts')
-    alerts_slack_enabled: Optional[bool] = Field(False, description='Enable Slack alerts')
+    alerts_email_from: str | None = Field(None, description='Email address to send alerts from')
+    alerts_email_to: str | None = Field(None, description='Email address to send alerts to')
+    alerts_sms_enabled: bool | None = Field(False, description='Enable SMS alerts')
+    alerts_slack_enabled: bool | None = Field(False, description='Enable Slack alerts')
 
     # Possible future settings
     # app_version: str = Field(..., description='The version of the application')

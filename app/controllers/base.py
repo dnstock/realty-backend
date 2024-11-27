@@ -1,7 +1,7 @@
 from sqlalchemy.exc import NoResultFound, MultipleResultsFound, IntegrityError
 from sqlalchemy.sql import exists
 from pydantic import BaseModel
-from typing import Type, Optional, Any
+from typing import Type, Any
 from core.logger import log_exception
 from sqlalchemy.orm import Session
 from schemas.base import PaginatedResults, AllResults, Tid as SchemaTid
@@ -15,7 +15,7 @@ from db import T as ModelT
 def exists_where(db: Session, model: Type[ModelT], key: str, val: Any) -> bool:
     return db.query(exists().where(getattr(model, key) == val)).scalar()
 
-def get_by(db: Session, model: Type[ModelT], key: str, val: Any) -> Optional[ModelT]:
+def get_by(db: Session, model: Type[ModelT], key: str, val: Any) -> ModelT | None:
     try:
         return db.query(model).filter(getattr(model, key) == val).one()
     except NoResultFound as exc:
@@ -25,7 +25,7 @@ def get_by(db: Session, model: Type[ModelT], key: str, val: Any) -> Optional[Mod
         log_exception(exc, f'Multiple {model} records found where {key} = {val}')
         return None
 
-def get_by_id(db: Session, model: Type[ModelT], id: int) -> Optional[ModelT]:
+def get_by_id(db: Session, model: Type[ModelT], id: int) -> ModelT | None:
     return get_by(db=db, model=model, key='id', val=id)
 
 def get_all(db: Session, model: Type[ModelT], parent_key: str, parent_value: int) -> AllResults:
@@ -40,7 +40,7 @@ def get_all_paginated(db: Session, model: Type[ModelT], parent_key: str, parent_
     rows = query.offset(skip).limit(limit).all()
     return PaginatedResults(rows=rows, totalCount=totalCount, pageStart=min(skip, totalCount), pageEnd=min(skip + limit, totalCount))
 
-def create_and_commit(db: Session, model: Type[ModelT], schema: BaseModel, parent_key: str, parent_value: int) -> Optional[ModelT]:
+def create_and_commit(db: Session, model: Type[ModelT], schema: BaseModel, parent_key: str, parent_value: int) -> ModelT | None:
     try:
         db_obj = model(**schema.model_dump())
         db_obj.__setattr__(parent_key, parent_value)
@@ -57,7 +57,7 @@ def create_and_commit(db: Session, model: Type[ModelT], schema: BaseModel, paren
         db.rollback()
         return None
 
-def update_and_commit(db: Session, model: Type[ModelT], schema: SchemaTid) -> Optional[ModelT]: # type: ignore
+def update_and_commit(db: Session, model: Type[ModelT], schema: SchemaTid) -> ModelT | None: # type: ignore
     try:
         db_obj = db.query(model).filter(getattr(model, 'id') == schema.id).one()
 

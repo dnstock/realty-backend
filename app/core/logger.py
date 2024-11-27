@@ -1,14 +1,14 @@
 import logging
 import json
 from pathlib import Path
-from typing import Optional, Any
+from typing import Any
 from contextvars import ContextVar
 from logging.handlers import RotatingFileHandler, SMTPHandler
 from fastapi import Request
 from core import settings
 
 # Request ID for correlating logs to a single request
-request_id_context: ContextVar[Optional[str]] = ContextVar('request_id', default=None)
+request_id_context: ContextVar[str | None] = ContextVar('request_id', default=None)
 
 # Set up the log level dynamically from settings
 log_level = getattr(logging, settings.log_level, logging.INFO)
@@ -74,7 +74,7 @@ if not logger.hasHandlers():
         logger.addHandler(smtp_handler)
 
 # Log exceptions
-def log_exception(exc: Exception, occured_in: Optional[str]) -> None:
+def log_exception(exc: Exception, occured_in: str | None) -> None:
     logger.error(
         exc if occured_in is None else f'Exception occurred in {occured_in}: {exc}',
         exc_info=True,

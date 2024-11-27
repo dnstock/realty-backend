@@ -1,13 +1,13 @@
 from pydantic import EmailStr, Field
 from schemas.base import BaseModel, BaseModelWithId
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from schemas import LeaseSchema, InsuranceSchema
 
 class Base(BaseModel):
     name: str
-    email: Optional[EmailStr] = None
-    phone: Optional[str] = None
+    email: EmailStr | None = None
+    phone: str | None = None
     lease_id: int
 
 class Create(Base):

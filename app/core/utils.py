@@ -1,6 +1,4 @@
-from typing import Optional
-
-def print_boxed_sections(*sections: list[tuple[str, str]], title: Optional[str] = None) -> None:
+def print_boxed_sections(*sections: list[tuple[str, str]], title: str | None = None) -> None:
     """
     Prints multiple sections in boxed format with a single border between sections.
 

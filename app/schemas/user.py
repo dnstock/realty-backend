@@ -1,14 +1,14 @@
 from pydantic import EmailStr, Field
 from schemas.base import BaseModel, BaseModelWithId
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from schemas import PropertySchema
 
 class Base(BaseModel):
     name: str
     email: EmailStr
-    is_active: Optional[bool] = None
     password: str = Field(exclude=True)  # Non-serializable
+    is_active: bool | None = None
 
 class Create(Base):
     pass

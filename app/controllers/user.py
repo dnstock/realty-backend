@@ -1,4 +1,4 @@
-from typing import Optional, Any
+from typing import Any
 from sqlalchemy.sql.expression import and_
 from sqlalchemy.sql import exists
 from sqlalchemy.exc import NoResultFound, MultipleResultsFound
@@ -15,7 +15,7 @@ def exists_where(db: Session, key: str, val: Any) -> bool:
 def is_active(db: Session, email: str) -> bool:
     return db.query(exists().where(and_(User.email == email, User.is_active == True))).scalar()
 
-def get_by(db: Session, key: str, val: Any) -> Optional[User]:
+def get_by(db: Session, key: str, val: Any) -> User | None:
     try:
         return db.query(User).filter(getattr(User, key) == val).one()
     except NoResultFound as exc:
@@ -25,10 +25,10 @@ def get_by(db: Session, key: str, val: Any) -> Optional[User]:
         log_exception(exc, f'Multiple User records found where {key} = {val}')
         return None
 
-def get_by_id(db: Session, id: int) -> Optional[User]:
+def get_by_id(db: Session, id: int) -> User | None:
     return get_by(db=db, key='id', val=id)
 
-def get_by_email(db: Session, email: str) -> Optional[User]:
+def get_by_email(db: Session, email: str) -> User | None:
     return get_by(db=db, key='email', val=email)
 
 def get_all(db: Session) -> AllResults:
@@ -43,7 +43,7 @@ def get_all_paginated(db: Session, skip: int = 0, limit: int = 10) -> PaginatedR
     rows = query.offset(skip).limit(limit).all()
     return PaginatedResults(rows=rows, totalCount=totalCount, pageStart=min(skip, totalCount), pageEnd=min(skip + limit, totalCount))
 
-def create_and_commit(db: Session, schema: UserSchema.Create) -> Optional[User]:
+def create_and_commit(db: Session, schema: UserSchema.Create) -> User | None:
     try:
         db_obj = User(**schema.model_dump())
         setattr(db_obj, 'password', security.get_password_hash(schema.password))
@@ -56,7 +56,7 @@ def create_and_commit(db: Session, schema: UserSchema.Create) -> Optional[User]:
         db.rollback()
         return None
 
-def update_and_commit(db: Session, schema: UserSchema.Update) -> Optional[User]:
+def update_and_commit(db: Session, schema: UserSchema.Update) -> User | None:
     try:
         user = db.query(User).filter(User.id == schema.id).one()
         for key, value in schema.model_dump().items():
