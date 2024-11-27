@@ -44,7 +44,7 @@ def get_all_paginated(db: Session, skip: int = 0, limit: int = 10) -> PaginatedR
 
 def create_and_commit(db: Session, schema: UserSchema.Create) -> User | None:
     try:
-        db_obj = User(**schema.model_dump())
+        db_obj = User(**schema.model_dump(exclude_unset=True))
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
@@ -57,7 +57,10 @@ def create_and_commit(db: Session, schema: UserSchema.Create) -> User | None:
 def update_and_commit(db: Session, schema: UserSchema.Update) -> User | None:
     try:
         user = db.query(User).filter(User.id == schema.id).one()
-        for key, value in schema.model_dump().items():
+        for key, value in schema.model_dump(
+            exclude_unset=True,
+            exclude={'id'},
+        ).items():
             setattr(user, key, value)
         db.commit()
         db.refresh(user)

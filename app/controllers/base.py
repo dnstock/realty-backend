@@ -42,7 +42,7 @@ def get_all_paginated(db: Session, model: Type[ModelT], parent_key: str, parent_
 
 def create_and_commit(db: Session, model: Type[ModelT], schema: BaseModel, parent_key: str, parent_value: int) -> ModelT | None:
     try:
-        db_obj = model(**schema.model_dump())
+        db_obj = model(**schema.model_dump(exclude_unset=True))
         db_obj.__setattr__(parent_key, parent_value)
         db.add(db_obj)
         db.commit()
@@ -63,9 +63,10 @@ def update_and_commit(db: Session, model: Type[ModelT], schema: SchemaTid) -> Mo
 
         primary_key = {key.name for key in getattr(model, '__table__').primary_key}
 
-        for key, value in schema.model_dump().items():
-            if key in primary_key:
-                continue
+        for key, value in schema.model_dump(
+            exclude_unset=True,
+            exclude=primary_key,
+        ).items():
             setattr(db_obj, key, value)
 
         db.commit()
