@@ -13,7 +13,7 @@ register_error_handlers(app)
 register_middleware(app)
 
 # Register API routes
-app.include_router(api_router, prefix="/api")
+app.include_router(api_router, prefix='/api')
 
 app_info = [
     ('Application Name', settings.app_name),
@@ -30,4 +30,4 @@ system_info = [
 ]
 
 # Run when the application starts
-utils.print_boxed_sections(app_info, system_info, title="Application Information")
+utils.print_boxed_sections(app_info, system_info, title='Application Information')

@@ -11,7 +11,7 @@ modules: list[ModuleType] = [auth, users, properties, buildings, units, leases, 
 for module in modules:
     module_name: str = module.__name__.split('.')[-1]  # Get the module name without the package name
     router.include_router(getattr(module, 'router', APIRouter()), prefix=f'/{module_name}', tags=[module_name])
-    
+
 # Register middleware for API v1
 def register_middleware(app: FastAPI) -> None:
     v1_cors_middleware(app)

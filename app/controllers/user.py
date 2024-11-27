@@ -1,100 +1,78 @@
-from typing import Optional, List, Callable
+from typing import Optional, Any
 from sqlalchemy.sql.expression import and_
 from sqlalchemy.sql import exists
 from sqlalchemy.exc import NoResultFound, MultipleResultsFound
-from core import logger, security
+from core import security
 from core.logger import log_exception
 from schemas import UserSchema
 from db.models import User
-from db import models, get_db
+from sqlalchemy.orm import Session
+from schemas.base import PaginatedResults, AllResults
 
-def email_exists(email: str) -> bool:
-    db = get_db()
-    return db.query(exists().where(User.email == email)).scalar()
+def exists_where(db: Session, key: str, val: Any) -> bool:
+    return db.query(exists().where(getattr(User, key) == val)).scalar()
 
-def is_active(email: str) -> bool:
-    db = get_db()
+def is_active(db: Session, email: str) -> bool:
     return db.query(exists().where(and_(User.email == email, User.is_active == True))).scalar()
 
-def get_by_id(id: int) -> Optional[User]:
-    db = get_db()
-    return db.query(User).filter(User.id == id).one_or_none()
+def get_by(db: Session, key: str, val: Any) -> Optional[User]:
+    try:
+        return db.query(User).filter(getattr(User, key) == val).one()
+    except NoResultFound as exc:
+        log_exception(exc, f'No User record found where {key} = {val}')
+        return None
+    except MultipleResultsFound as exc:
+        log_exception(exc, f'Multiple User records found where {key} = {val}')
+        return None
 
-def get_by_email(email: str) -> Optional[User]:
-    db = get_db()
-    return db.query(User).filter(User.email == email).one_or_none()
+def get_by_id(db: Session, id: int) -> Optional[User]:
+    return get_by(db=db, key='id', val=id)
 
-def get_all(skip: int = 0, limit: int = 10) -> List[User]:
-    db = get_db()
-    return db.query(User).offset(skip).limit(limit).all()
+def get_by_email(db: Session, email: str) -> Optional[User]:
+    return get_by(db=db, key='email', val=email)
 
-def create_and_commit(schema: UserSchema.Create) -> Optional[User]:
-    db = get_db()
+def get_all(db: Session) -> AllResults:
+    query = db.query(User)
+    totalCount = query.count()
+    rows = query.all()
+    return AllResults(rows=rows, totalCount=totalCount)
+
+def get_all_paginated(db: Session, skip: int = 0, limit: int = 10) -> PaginatedResults:
+    query = db.query(User)
+    totalCount = query.count()
+    rows = query.offset(skip).limit(limit).all()
+    return PaginatedResults(rows=rows, totalCount=totalCount, pageStart=min(skip, totalCount), pageEnd=min(skip + limit, totalCount))
+
+def create_and_commit(db: Session, schema: UserSchema.Create) -> Optional[User]:
     try:
         db_obj = User(**schema.model_dump())
-        setattr(db_obj, "password", security.get_password_hash(schema.password))
+        setattr(db_obj, 'password', security.get_password_hash(schema.password))
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
         return db_obj
     except Exception as exc:
-        log_exception(exc, "Error creating user")
+        log_exception(exc, 'Error creating user')
         db.rollback()
         return None
 
-def update_and_commit(schema: UserSchema.Update, id: int) -> Optional[User]:
-    db = get_db()
+def update_and_commit(db: Session, schema: UserSchema.Update, id: int) -> Optional[User]:
     try:
         user = db.query(User).filter(User.id == id).one()
         for key, value in schema.model_dump().items():
-            if key == "password":
+            if key == 'password':
                 value = security.get_password_hash(value)
             setattr(user, key, value)
         db.commit()
         db.refresh(user)
         return user
     except NoResultFound as exc:
-        log_exception(exc, f"No record found for id {id}")
+        log_exception(exc, f'No record found for id {id}')
         return None
     except MultipleResultsFound as exc:
-        log_exception(exc, f"Multiple records found for id {id}")
+        log_exception(exc, f'Multiple records found for id {id}')
         return None
     except Exception as exc:
-        log_exception(exc, "Error updating user")
+        log_exception(exc, 'Error updating user')
         db.rollback()
         return None
-    
-def validate_ownership(current_user: UserSchema.Read, model_name: str, resource_id: int) -> bool:
-    db = get_db()
-    try:
-        db_obj = db.query(getattr(models, model_name)).filter_by(id=resource_id).one_or_none()
-        if db_obj is None:
-            logger.error(f"{model_name} with ID {resource_id} not found")
-            return False
-        
-        owner_map: dict[str, Callable[[object], int]] = {
-            "Property": lambda obj: obj.manager_id, # type: ignore
-            "Building": lambda obj: obj.property.manager_id, # type: ignore
-            "Unit": lambda obj: obj.building.property.manager_id, # type: ignore
-            "Lease": lambda obj: obj.unit.building.property.manager_id, # type: ignore
-            "Tenant": lambda obj: obj.lease.unit.building.property.manager_id, # type: ignore
-            "Insurance": lambda obj: obj.tenant.lease.unit.building.property.manager_id, # type: ignore
-        }
-        
-        owner_id = owner_map.get(model_name)
-        if owner_id is None:
-            logger.error(f"Ownership validation not supported for {model_name}")
-            return False
-        
-        if owner_id(db_obj) != current_user.id:
-            logger.warning(f"User {current_user.id} does not have permission to access {model_name} with ID {resource_id}")
-            return False
-        
-        return True
-    
-    except AttributeError as exc:
-        log_exception(exc, "Attribute error during ownership validation")
-        return False
-    except Exception as exc:
-        log_exception(exc, "Error during ownership validation")
-        return False

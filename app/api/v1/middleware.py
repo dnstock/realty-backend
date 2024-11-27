@@ -13,6 +13,6 @@ def v1_cors_middleware(app: FastAPI) -> None:
     if(settings.api_v1_cors_origins is not None):
         app.add_middleware(CORSMiddleware,
             allow_origins=settings.api_v1_cors_origins,
-            allow_methods=["*"],
-            allow_headers=["*"],
+            allow_methods=['*'],
+            allow_headers=['*'],
         )

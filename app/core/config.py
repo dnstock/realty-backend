@@ -17,7 +17,7 @@ env_specific_file = ROOT_DIR / 'envs' / f'.env.{os.getenv('ENVIRONMENT')}'
 env_files = (ROOT_DIR / 'envs' / '.env',)
 if Path(env_specific_file).is_file():
     env_files += (env_specific_file,)
-    
+
 class Settings(BaseSettings):
     # Application and Server Configuration
     app_name: str = Field(..., description='The name of the application')
@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     app_env: str = Field(..., description='The environment the application is running in')
     app_debug: bool = Field(False, description='The debug mode of the application')
     app_is_docked: bool = is_docker_env
-    
+
     # Database Configuration
     postgres_user: str = Field(..., description='Postgres database user')
     postgres_password: str = Field(..., description='Postgres database password')
@@ -42,7 +42,7 @@ class Settings(BaseSettings):
     postgres_test_url: str = ''
     sqlalchemy_future: bool = True  # Use the latest features and deprecations
     sqlalchemy_echo: bool = False  # Implementation of postgres_log_queries
-    
+
     # JWT and Security Configuration
     jwt_secret_key: str = Field(..., description='JWT secret')
     jwt_algorithm: str = Field(..., description='JWT algorithm')
@@ -50,11 +50,11 @@ class Settings(BaseSettings):
     jwt_refresh_token_expire_days: int = Field(..., description='JWT refresh token expiry time in days')
     # jwt_reset_password_token_expire_minutes: int = Field(..., description='JWT reset password token expiry time in minutes')
     # jwt_verify_email_token_expire_minutes: int = Field(..., description='JWT verify email token expiry time in minutes')
-    
+
     # API Configuration
     api_cors_origins: list[str] = Field(..., description='List of allowed origins')
     api_v1_cors_origins: Optional[list[str]] = Field(None, description='List of allowed origins specific for v1 API')
-    
+
     # Redis or Cache Configuration
     redis_host: str = Field(..., description='Redis server hostname or IP address')
     redis_port: int = Field(6379, description='Redis server port')
@@ -62,13 +62,13 @@ class Settings(BaseSettings):
     redis_cache_db: int = Field(1, description='Redis cache database index')
     redis_db_url: str = ''
     redis_cache_url: str = ''
-    
+
     # Email Configuration
     smtp_server: Optional[str] = Field(None, description='Email host')
     smtp_port: Optional[str] = Field(None, description='Email port')
     smtp_user: Optional[str] = Field(None, description='Email user')
     smtp_password: Optional[str] = Field(None, description='Email password')
-    
+
     # Logging Configuration
     log_dir: str = Field('logs', description='The log directory of the application')
     log_file: str = Field('app.log', description='The log file of the application')
@@ -80,7 +80,7 @@ class Settings(BaseSettings):
     log_format: Literal['text', 'json'] = Field('text', description='The log formatter to use (text or json)')
     log_format_file: Optional[Literal['text', 'json']] = Field(None, description='The log formatter for the log file (optional)')
     log_format_console: Optional[Literal['text', 'json']] = Field(None, description='The log formatter for the console (optional)')
-    
+
     # Alerts Configuration
     alerts_email_enabled: bool = Field(False, description='Enable email alerts')
     alerts_email_from: Optional[str] = Field(None, description='Email address to send alerts from')
@@ -135,40 +135,40 @@ class Settings(BaseSettings):
         else:
             # Set to value of environment variable, if defined
             return values['postgres_debug_log_queries']
-    
+
     # Uppercase the log levels
     @field_validator('log_level', 'log_level_file', 'log_level_console', mode='before')
     @classmethod
     def ensure_uppercase_log_levels(cls, v: str | None, info: ValidationInfo) -> str:
         values = info.data
         return values['log_level'].upper() if v is None else v.upper()
-    
+
     # Set the log formats
     @field_validator('log_format', 'log_format_file', 'log_format_console', mode='after')
     @classmethod
     def set_log_formats(cls, v: str | None, info: ValidationInfo) -> str:
         values = info.data
         return values['log_format'].lower() if v is None else v.lower()
-    
+
     # Construct the database URLs
     @field_validator('postgres_url', 'postgres_test_url', mode='after')
     @classmethod
     def construct_database_urls(cls, v: str | None, info: ValidationInfo) -> str:
         values = info.data
         base_url = (
-            f"postgresql://{values['postgres_user']}:{values['postgres_password']}"
-            f"@{values['postgres_host']}:{values['postgres_port']}/"
+            f'postgresql://{values['postgres_user']}:{values['postgres_password']}'
+            f'@{values['postgres_host']}:{values['postgres_port']}/'
         )
         if info.field_name == 'postgres_test_url':
             return base_url + values['postgres_test_db']
         return base_url + values['postgres_db']
-    
+
     # Construct the Redis URLs
     @field_validator('redis_db_url', 'redis_cache_url', mode='after')
     @classmethod
     def adjust_redis_host_and_url(cls, v: str | None, info: ValidationInfo) -> str:
         values = info.data
-        base_url = f'redis://{values["redis_host"]}:{values["redis_port"]}/'
+        base_url = f'redis://{values['redis_host']}:{values['redis_port']}/'
         if info.field_name == 'redis_cache_url':
             return base_url + str(values['redis_cache_db'])
         return base_url + str(values['redis_db'])

@@ -13,7 +13,7 @@ def v1_http_exception_handler(app: FastAPI) -> None:
         log_middleware_exception(exc, request)
         return JSONResponse(
             status_code=exc.status_code,
-            content={"detail (v1-specific)": exc.detail},
+            content={'detail (v1-specific)': exc.detail},
         )
     app.add_exception_handler(HTTPException, handler) # type: ignore (only HTTPException is allowed)
 
@@ -23,6 +23,6 @@ def v1_unhandled_exception_handler(app: FastAPI) -> None:
         log_middleware_exception(exc, request)
         return JSONResponse(
             status_code=500,
-            content={"detail (v1-specific)": "An unexpected server error occurred."},
+            content={'detail (v1-specific)': 'An unexpected server error occurred.'},
         )
     app.add_exception_handler(Exception, handler)

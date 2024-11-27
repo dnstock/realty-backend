@@ -1,11 +1,7 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker, scoped_session
+from sqlalchemy.orm import sessionmaker, Session
 from core import settings
-from contextvars import ContextVar
-from typing import Optional
-
-# Create a context variable to hold the db session
-db_session_context: ContextVar[Optional[Session]] = ContextVar("db_session", default=None)
+from typing import Generator
 
 engine = create_engine(
     settings.postgres_url,
@@ -17,15 +13,17 @@ engine = create_engine(
     pool_pre_ping=True,  # Ensure that connections are alive
 )
 
-# Ensure thread-safe sessions (each request gets its own session)
-SessionLocal = scoped_session(sessionmaker(
-    autocommit=False, 
+# Create database session factory
+SessionLocal = sessionmaker(
+    autocommit=False,
     autoflush=False,
-    bind=engine
-))
+    bind=engine,
+)
 
-def get_db() -> Session:
-    db = db_session_context.get()
-    if db is None:
-        raise Exception("Database session not found")
-    return db
+# Create new database session
+def get_db() -> Generator[Session, None, None]:
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

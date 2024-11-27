@@ -3,7 +3,7 @@ from typing import Optional
 def print_boxed_sections(*sections: list[tuple[str, str]], title: Optional[str] = None) -> None:
     """
     Prints multiple sections in boxed format with a single border between sections.
-    
+
     Args:
         sections: A list of sections where each section is a list of key-value pairs (label and value).
         title: (Optional) A title that will be displayed at the top of the output with a unique style.

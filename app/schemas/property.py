@@ -10,17 +10,17 @@ class Base(BaseConfigModel):
     city: str
     state: Annotated[str, constr(min_length=2, max_length=2, to_upper=True)]
     zip_code: Annotated[str, constr(pattern=r'^\d{5}$')]
-    type: Annotated[Literal["commercial", "residential"], constr(to_lower=True)]
+    type: Annotated[Literal['commercial', 'residential'], constr(to_lower=True)]
     manager_id: Optional[int] = None
-    
+
     @field_validator('type', mode='before')
     def normalize_type(cls, value: str) -> str:
         return value.lower()
-    
+
     @field_validator('city', mode='before')
     def capitalize_city(cls, value: str) -> str:
         return value.capitalize()
-    
+
 class Create(Base):
     pass
 

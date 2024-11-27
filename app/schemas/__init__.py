@@ -11,21 +11,22 @@ from . import (
 )
 
 __all__ = [
-    "BaseSchema",
-    "UserSchema",
-    "BuildingSchema",
-    "UnitSchema",
-    "LeaseSchema",
-    "TenantSchema",
-    "InsuranceSchema",
-    "PropertySchema",
+    'BaseSchema',
+    'UserSchema',
+    'BuildingSchema',
+    'UnitSchema',
+    'LeaseSchema',
+    'TenantSchema',
+    'InsuranceSchema',
+    'PropertySchema',
 ]
 
 # Resolve forward references (while avoiding circular imports)
-UserSchema.Read.model_rebuild()
-PropertySchema.Read.model_rebuild()
-BuildingSchema.Read.model_rebuild()
-UnitSchema.Read.model_rebuild()
-LeaseSchema.Read.model_rebuild()
-TenantSchema.Read.model_rebuild()
-InsuranceSchema.Read.model_rebuild()
+UserSchema.ReadFull.model_rebuild()
+PropertySchema.ReadFull.model_rebuild()
+BuildingSchema.ReadFull.model_rebuild()
+UnitSchema.ReadFull.model_rebuild()
+LeaseSchema.ReadFull.model_rebuild()
+TenantSchema.ReadFull.model_rebuild()
+InsuranceSchema.ReadFull.model_rebuild()
+BaseSchema.RequestContext.model_rebuild()

@@ -1,29 +1,65 @@
-from fastapi import HTTPException, status, Request, Response
-from typing import Type
+from fastapi import HTTPException, status, Depends
+from sqlalchemy.orm import Session
+from typing import Type, Callable
 from core.oauth2 import get_current_user
-from controllers.user import validate_ownership
-from schemas.user import Read as UserSchemaRead
-from schemas.base import T, PaginatedResults
+from schemas.user import Read as CurrentUser
+from schemas.base import T, PaginatedResults, RequestContext
+from db import models, get_db
+from core.logger import logger, log_exception
 
-# Dependency to get the current active user
-def get_current_active_user(request: Request, response: Response) -> UserSchemaRead:
-    current_user = get_current_user(request, response)
-    if not current_user.is_active:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Inactive user"')
-    return current_user
+# Get the current active user and a new database session
+def get_request_context(
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user)
+) -> RequestContext:
+    return RequestContext(db=db, current_user=current_user)
 
-# Dependency to validate ownership
-def authorize_access(
-    model_name: str,
-    resource_id: int,
-    current_user: UserSchemaRead
-) -> None:
-    # print debugging
-    print(f"Validating ownership for {model_name} with ID {resource_id} by user {current_user}")
-    if not validate_ownership(model_name=model_name, resource_id=resource_id, current_user=current_user):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f'Not authorized to access this {model_name}')
-
-# Validate and serialize resultset
-def serialize_results(results: PaginatedResults, schema: Type[T]) -> PaginatedResults:
+# Serialize resultset
+def serialize_results(
+    results: PaginatedResults,
+    schema: Type[T],
+) -> PaginatedResults:
     results.rows = [schema.model_validate(item) for item in results.rows]
     return results
+
+# Validate ownership of parent resource
+def validate_ownership(
+    model_name: str,
+    resource_id: int,
+    context: RequestContext = Depends(get_request_context),
+) -> None:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail=f'Not authorized to access this {model_name}'
+    )
+    logger.info(f'Validating ownership for {model_name} with ID {resource_id} by user {context.current_user}')
+    try:
+        db_obj = context.db.query(getattr(models, model_name)).filter_by(id=resource_id).one_or_none()
+        if db_obj is None:
+            logger.error(f'{model_name} with ID {resource_id} not found')
+            raise credentials_exception
+
+        owner_map: dict[str, Callable[[object], int]] = {
+            'Property': lambda obj: obj.manager_id, # type: ignore
+            'Building': lambda obj: obj.property.manager_id, # type: ignore
+            'Unit': lambda obj: obj.building.property.manager_id, # type: ignore
+            'Lease': lambda obj: obj.unit.building.property.manager_id, # type: ignore
+            'Tenant': lambda obj: obj.lease.unit.building.property.manager_id, # type: ignore
+            'Insurance': lambda obj: obj.tenant.lease.unit.building.property.manager_id, # type: ignore
+        }
+
+        owner_id = owner_map.get(model_name)
+        if owner_id is None:
+            logger.error(f'Ownership validation not supported for {model_name}')
+            raise credentials_exception
+
+        if owner_id(db_obj) != context.get_user_id():
+            logger.warning(f'User {context.get_user_id()} does not have permission to access {model_name} with ID {resource_id}')
+            raise credentials_exception
+
+    except AttributeError as exc:
+        log_exception(exc, 'Attribute error during ownership validation')
+        raise credentials_exception
+    except Exception as exc:
+        log_exception(exc, 'Error during ownership validation')
+        raise credentials_exception

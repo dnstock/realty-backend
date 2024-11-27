@@ -10,12 +10,12 @@ from . import (
 )
 
 __all__ = [
-    "BaseController",
-    "UserController",
-    "PropertyController",
-    "BuildingController",
-    "UnitController",
-    "LeaseController",
-    "TenantController",
-    "InsuranceController",
+    'BaseController',
+    'UserController',
+    'PropertyController',
+    'BuildingController',
+    'UnitController',
+    'LeaseController',
+    'TenantController',
+    'InsuranceController',
 ]

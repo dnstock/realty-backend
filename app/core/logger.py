@@ -8,7 +8,7 @@ from fastapi import Request
 from core import settings
 
 # Request ID for correlating logs to a single request
-request_id_context: ContextVar[Optional[str]] = ContextVar("request_id", default=None)
+request_id_context: ContextVar[Optional[str]] = ContextVar('request_id', default=None)
 
 # Set up the log level dynamically from settings
 log_level = getattr(logging, settings.log_level, logging.INFO)
@@ -54,13 +54,13 @@ json_formatter = JsonFormatter()
 # Set the file and console formatters
 file_handler.setFormatter(json_formatter if settings.log_format_file == 'json' else text_formatter)
 console_handler.setFormatter(json_formatter if settings.log_format_console == 'json' else text_formatter)
-    
+
 # Optional: Create an SMTP handler for critical errors (e.g. email alerts)
 smtp_handler = SMTPHandler(
     mailhost=(settings.smtp_server, settings.smtp_port),       # type: ignore (handled by field validator)
     fromaddr=settings.alerts_email_from,                       # type: ignore (handled by field validator)
     toaddrs=settings.alerts_email_to,                          # type: ignore (handled by field validator)
-    subject="Critical Error in Application",
+    subject='Critical Error in Application',
     credentials=(settings.smtp_user, settings.smtp_password),  # type: ignore (handled by field validator)
     secure=()
 )
@@ -76,9 +76,9 @@ if not logger.hasHandlers():
 # Log exceptions
 def log_exception(exc: Exception, occured_in: Optional[str]) -> None:
     logger.error(
-        exc if occured_in is None else f"Exception occurred in {occured_in}: {exc}",
+        exc if occured_in is None else f'Exception occurred in {occured_in}: {exc}',
         exc_info=True,
-        extra={"request_id": request_id_context.get()}
+        extra={'request_id': request_id_context.get()}
     )
 
 def log_middleware_exception(exc: Exception, request: Request) -> None:
