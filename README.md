@@ -1,92 +1,153 @@
-# Realty Project
+# Realty.AI Backend
 
-This is a full-stack application for property management, combining a FastAPI backend and a React frontend.
+Backend API service for real estate property management platform.
 
-## Project Structure
+## Features
 
-```
-realty/
-│
-├── backend/ # Backend code (FastAPI, database models, migrations)
-├── frontend/ # Frontend code (React, components, services)
-├── docker-compose.yml # Docker setup for both frontend and backend
-└── README.md # Project documentation
-```
+- RESTful API endpoints for managing properties, buildings, units, leases and tenants
+- JWT authentication and authorization
+- Role-based access control
+- Database migrations with Alembic
+- Logging with configurable outputs
+- Docker support for development and production
+- Comprehensive test suite
+- CORS configuration
+- Request ID tracking
+- Configurable alerts (email, SMS, Slack)
+- More...
+
+## Tech Stack
+
+- Python 3.x
+- FastAPI
+- PostgreSQL
+- SQLAlchemy
+- Alembic
+- Redis
+- Docker
+- Pytest
+- More...
 
 ## Getting Started
 
 ### Prerequisites
+- Python 3.x
+- PostgreSQL
+- Redis
+- Docker (optional)
 
-- Docker and Docker Compose installed on your machine.
-- Node.js and npm installed if running frontend locally outside of Docker.
+### Installation
 
-### Setup
+1. Clone the repository
+2. Create a virtual environment:
+```sh
+python3 -m venv venv source venv/bin/activate
+```
+3. Install dependencies:
+```sh
+pip install -r requirements.txt
+```
+4. Copy environment file:
+```sh
+cp .env.example .env
+```
+5. Configure environment variables in [.env](http://_vscodecontentref_/0)
 
-1. **Clone the repository:**
-    ```bash
-    git clone https://github.com/your-repo/realty.git
-    cd realty
-    ```
+### Running Locally
 
-1. **Set up environment variables:**
-   - Create `.env` file and fill in appropriate values. Refer to `backend/envs/.env.example` file.
-   - Optionally, create environment-specific files. Refer to `backend/envs/*.example` files.
+Start the development server:
 
-1. **Set up database and run migrations:**
-    - Create a PostgreSQL database.
-    - Create a user with r+w access to the database.
+```sh
+uvicorn app.main:app --reload
+```
 
-1. **Run migrations to initialize database:**
-    ```bash
-    export ENVIRONMENT=development
-    alembic upgrade head
-    ```
+The API will be available at:
 
-1. **Run unit tests for the application:**
-    ```bash
-    pytest tests
-    ```
+    http://localhost:8000
 
-1. **Setup Docker to use development environment:**
-    ```bash
-    # Copy the docker-compose-env file to .env
-    cp docker-compose-env .env
+### Docker Setup
 
-    # Open .env and uncomment the development mode section
-    vi .env
-    ```
+Build and run with Docker Compose:
+```sh
+docker-compose up --build
+```
 
-1. **Run the application with Docker:**
-    ```bash
-    docker-compose up --build
-    ```
+For production:
+```sh
+docker-compose -f docker-compose.prod.yml up -d
+```
 
-1. **Access the application:**
-   - Backend API: `http://localhost:8000`
-   - Frontend: `http://localhost:3000`
+### Database Migrations
 
-### Useful Commands
+Create a new migration:
+```sh
+alembic revision --autogenerate -m "Description"
+```
 
-- **Start the services:**
-    ```bash
-    docker compose up --build
-    ```
+Apply migrations:
+```sh
+alembic upgrade head
+```
 
-- **Stop the services:**
-    ```bash
-    docker compose down
-    ```
+### Running Tests
 
-- **Rebuild the services:**
-    ```bash
-    docker compose up --build
-    ```
+Execute the test suite:
 
-### Project Details
+```sh
+pytest
+```
 
-- **Backend:** FastAPI, PostgreSQL
-- **Frontend:** React, Axios, React Router
+## API Documentation
+
+Once running, view the interactive API documentation at:
+- Swagger UI:
+
+    http://localhost:8000/docs
+
+- ReDoc:
+
+    http://localhost:8000/redoc
+
+## Environment Variables Key environment variables for configuration:
+```ini
+# Application
+APP_NAME=realty-api
+APP_ENV=development
+APP_DEBUG=true
+
+# Database
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=password
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_DB=realty
+
+# Authentication
+JWT_SECRET_KEY=secret
+JWT_ALGORITHM=HS256
+
+# Logging
+LOG_LEVEL=debug
+LOG_FORMAT=json
+```
+
+See [.env.example](http://_vscodecontentref_/1) for all available configuration options.
+
+## Project Structure
+```
+.
+├── alembic/ # Database migrations
+├── app/
+│ ├── api/ # API endpoints and routing
+│ ├── controllers/ # Business logic
+│ ├── core/ # Core functionality
+│ ├── db/ # Database models and config
+│ ├── schemas/ # Pydantic models
+│ └── tests/ # Test suite
+├── scripts/ # Utility scripts
+└── docker/ # Docker configuration
+```
 
 ## License
 
-This application contains proprietary code and may not be used, copied or distributed.
+Private and Confidential. All rights reserved.
