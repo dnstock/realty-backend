@@ -51,7 +51,7 @@ pip install -r requirements.txt
 ```sh
 cp .env.example .env
 ```
-5. Configure environment variables in [.env](http://_vscodecontentref_/0)
+5. Configure environment variables in the `.env` file.
 
 ### Running Locally
 
@@ -101,12 +101,14 @@ pytest
 
 Once running, view the interactive API documentation at:
 - Swagger UI:
-
+    ```
     http://localhost:8000/docs
+    ```
 
 - ReDoc:
-
+    ```
     http://localhost:8000/redoc
+    ```
 
 ## Environment Variables Key environment variables for configuration:
 ```ini
@@ -131,21 +133,21 @@ LOG_LEVEL=debug
 LOG_FORMAT=json
 ```
 
-See [.env.example](http://_vscodecontentref_/1) for all available configuration options.
+See  the `.env.example` file for all available configuration options.
 
 ## Project Structure
 ```
 .
-├── alembic/ # Database migrations
+├── alembic/            # Database migrations
 ├── app/
-│ ├── api/ # API endpoints and routing
-│ ├── controllers/ # Business logic
-│ ├── core/ # Core functionality
-│ ├── db/ # Database models and config
-│ ├── schemas/ # Pydantic models
-│ └── tests/ # Test suite
-├── scripts/ # Utility scripts
-└── docker/ # Docker configuration
+│ ├── api/              # API endpoints and routing
+│ ├── controllers/      # Business logic
+│ ├── core/             # Core functionality
+│ ├── db/               # Database models and config
+│ ├── schemas/          # Pydantic models
+│ └── tests/            # Test suite
+├── logs/               # App log files
+└── scripts/            # Utility scripts
 ```
 
 ## License
