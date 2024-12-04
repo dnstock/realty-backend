@@ -146,6 +146,7 @@ See  the `.env.example` file for all available configuration options.
 │ ├── db/               # Database models and config
 │ ├── schemas/          # Pydantic models
 │ └── tests/            # Test suite
+├── envs/               # Environment settings
 ├── logs/               # App log files
 └── scripts/            # Utility scripts
 ```
