@@ -1,7 +1,3 @@
-#
-# Global ignores for frontend and backend applications
-#
-
 # Environments
 .env
 .env.*
