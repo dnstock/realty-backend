@@ -13,9 +13,6 @@
 .idea/
 *.iml
 
-# VS Code
-.vscode/
-
 # Local development logs
 *.log
 *.log.*
@@ -62,9 +59,6 @@ MANIFEST
 
 # Jupyter Notebook
 .ipynb_checkpoints
-
-# pyenv
-.python-version
 
 # pipenv
 Pipfile
