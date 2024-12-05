@@ -30,7 +30,7 @@ def set_token_cookie(response: Response, token_type: Literal['access', 'refresh'
         key=f'{token_type}_token',
         value=token,
         httponly=True,
-        secure=settings.app_env == 'DEVELOPMENT',  # Set to False if not using HTTPS, but keep True in production
+        secure=settings.app_env.lower() != 'development',  # Set to False if not using HTTPS, but keep True in production
         samesite='lax'
     )
 
