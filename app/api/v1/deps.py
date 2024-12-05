@@ -1,7 +1,7 @@
 from fastapi import HTTPException, status, Depends
 from sqlalchemy.orm import Session
 from typing import Type, Callable
-from core.oauth2 import get_current_user
+from core.oauth2 import get_current_user, get_current_user_optional
 from schemas.user import Read as CurrentUser
 from schemas.base import T, PaginatedResults, RequestContext
 from db import models, get_db
@@ -11,6 +11,14 @@ from core.logger import logger, log_exception
 def get_request_context(
     db: Session = Depends(get_db),
     current_user: CurrentUser = Depends(get_current_user)
+) -> RequestContext:
+    return RequestContext(db=db, current_user=current_user)
+
+# Get the current active user and a new database session if user is found and token is valid,
+# otherwise return only the database session without raising an exception
+def get_request_context_optional(
+    db: Session = Depends(get_db),
+    current_user: CurrentUser | None = Depends(get_current_user_optional)
 ) -> RequestContext:
     return RequestContext(db=db, current_user=current_user)
 

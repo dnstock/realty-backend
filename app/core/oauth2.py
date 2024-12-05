@@ -116,3 +116,17 @@ def get_current_user(
 
     except JWTError:
         raise credentials_exception(response)
+
+# Get current user without raising an exception if not found or if token is invalid
+def get_current_user_optional(
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db),
+) -> UserSchema.Read | None:
+    try:
+        return get_current_user(request, response, db)
+    except HTTPException as exc:
+        if exc.status_code == status.HTTP_401_UNAUTHORIZED:
+            return None
+        else:
+            raise exc
