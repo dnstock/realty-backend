@@ -41,7 +41,8 @@ Backend API service for real estate property management platform.
 1. Clone the repository
 2. Create a virtual environment:
 ```sh
-python3 -m venv venv source venv/bin/activate
+python3 -m venv .venv
+source .venv/bin/activate
 ```
 3. Install dependencies:
 ```sh
@@ -110,7 +111,10 @@ Once running, view the interactive API documentation at:
     http://localhost:8000/redoc
     ```
 
-## Environment Variables Key environment variables for configuration:
+## Environment Variables
+
+Key environment variables for configuration:
+
 ```ini
 # Application
 APP_NAME=realty-api
