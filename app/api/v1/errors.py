@@ -10,7 +10,6 @@ from core.logger import log_middleware_exception
 # Custom handler for HTTPException specific to v1
 def v1_http_exception_handler(app: FastAPI) -> None:
     def handler(request: Request, exc: HTTPException) -> JSONResponse:
-        log_middleware_exception(exc, request)
         return JSONResponse(
             status_code=exc.status_code,
             content={'detail (v1-specific)': exc.detail},

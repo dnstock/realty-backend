@@ -7,7 +7,6 @@ from core.logger import log_middleware_exception
 
 def common_http_exception_handler(app: FastAPI) -> None:
     def handler(request: Request, exc: HTTPException) -> JSONResponse:
-        log_middleware_exception(exc, request)
         return JSONResponse(
             status_code=exc.status_code,
             content={'detail': exc.detail},
