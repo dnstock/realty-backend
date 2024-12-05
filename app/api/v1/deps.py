@@ -28,7 +28,7 @@ def validate_ownership(
     resource_id: int,
     context: RequestContext = Depends(get_request_context),
 ) -> None:
-    credentials_exception = HTTPException(
+    access_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail=f'Not authorized to access this {model_name}'
     )
@@ -37,7 +37,7 @@ def validate_ownership(
         db_obj = context.db.query(getattr(models, model_name)).filter_by(id=resource_id).one_or_none()
         if db_obj is None:
             logger.error(f'{model_name} with ID {resource_id} not found')
-            raise credentials_exception
+            raise access_exception
 
         owner_map: dict[str, Callable[[object], int]] = {
             'Property': lambda obj: obj.manager_id, # type: ignore
@@ -51,15 +51,15 @@ def validate_ownership(
         owner_id = owner_map.get(model_name)
         if owner_id is None:
             logger.error(f'Ownership validation not supported for {model_name}')
-            raise credentials_exception
+            raise access_exception
 
         if owner_id(db_obj) != context.get_user_id():
             logger.warning(f'User {context.get_user_id()} does not have permission to access {model_name} with ID {resource_id}')
-            raise credentials_exception
+            raise access_exception
 
     except AttributeError as exc:
         log_exception(exc, 'Attribute error during ownership validation')
-        raise credentials_exception
+        raise access_exception
     except Exception as exc:
         log_exception(exc, 'Error during ownership validation')
-        raise credentials_exception
+        raise access_exception
