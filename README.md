@@ -144,12 +144,12 @@ See  the `.env.example` file for all available configuration options.
 .
 ├── alembic/            # Database migrations
 ├── app/
-│ ├── api/              # API endpoints and routing
-│ ├── controllers/      # Business logic
-│ ├── core/             # Core functionality
-│ ├── db/               # Database models and config
-│ ├── schemas/          # Pydantic models
-│ └── tests/            # Test suite
+│   ├── api/            # API endpoints and routing
+│   ├── controllers/    # Business logic
+│   ├── core/           # Core functionality
+│   ├── db/             # Database models and config
+│   ├── schemas/        # Pydantic models
+│   └── tests/          # Test suite
 ├── envs/               # Environment settings
 ├── logs/               # App log files
 └── scripts/            # Utility scripts
