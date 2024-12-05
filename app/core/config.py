@@ -156,7 +156,7 @@ class Settings(BaseSettings):
     def construct_database_urls(cls, v: str | None, info: ValidationInfo) -> str:
         values = info.data
         base_url = (
-            f'postgresql://{values['postgres_user']}:{values['postgres_password']}'
+            f'postgresql+psycopg://{values['postgres_user']}:{values['postgres_password']}'
             f'@{values['postgres_host']}:{values['postgres_port']}/'
         )
         if info.field_name == 'postgres_test_url':
