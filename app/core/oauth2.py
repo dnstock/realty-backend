@@ -43,24 +43,32 @@ def create_and_set_token_cookie(response: Response, token_type: Literal['access'
     set_token_cookie(response=response, token_type=token_type, token=token)
     return token
 
-def verify_token(db: Session, token: str, credentials_exception: HTTPException) -> UserSchema.Read:
+def credentials_exception(response: Response) -> HTTPException:
+    delete_token_cookies(response)
+    return HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail='Could not validate credentials',
+        headers={'WWW-Authenticate': 'Bearer'},
+    )
+
+def verify_token(db: Session, token: str, response: Response) -> UserSchema.Read:
     try:
         # Decode token and validate 'exp' claim
         payload = jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm])
         email = payload.get('sub')
         if not email:
-            raise credentials_exception
+            raise credentials_exception(response)
     except ExpiredSignatureError:
         # Re-raise to allow get_current_user to handle token expiration
         raise
     except JWTError as exc:
         # Log and raise for any other JWT-related errors
         log_exception(exc, 'Error decoding token')
-        raise credentials_exception from exc
+        raise credentials_exception(response) from exc
 
     user = UserController.get_by_email(db=db, email=email)
     if not user:
-        raise credentials_exception
+        raise credentials_exception(response)
 
     return UserSchema.Read.model_validate(user)
 
@@ -69,24 +77,18 @@ def get_current_user(
     response: Response,
     db: Session = Depends(get_db),
 ) -> UserSchema.Read:
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail='Could not validate credentials',
-        headers={'WWW-Authenticate': 'Bearer'},
-    )
-
     token = request.cookies.get('access_token')
     if not token:
-        raise credentials_exception
+        raise credentials_exception(response)
 
     try:
-        return verify_token(db, token, credentials_exception)
+        return verify_token(db, token, response)
 
     except ExpiredSignatureError:
         # Handle expired access token by using refresh token
         refresh_token = request.cookies.get('refresh_token')
         if not refresh_token:
-            raise credentials_exception
+            raise credentials_exception(response)
 
         try:
             # Verify refresh token
@@ -97,11 +99,11 @@ def get_current_user(
             )
             email = refresh_payload.get('sub')
             if not email:
-                raise credentials_exception
+                raise credentials_exception(response)
 
             user = UserController.get_by_email(db=db, email=email)
             if not user:
-                raise credentials_exception
+                raise credentials_exception(response)
 
             # Set the new access token in response cookies
             create_and_set_token_cookie(response=response, token_type='access', data={'sub': email})
@@ -110,7 +112,7 @@ def get_current_user(
 
         except JWTError as exc:
             log_exception(exc, 'Error decoding refresh token')
-            raise credentials_exception
+            raise credentials_exception(response)
 
     except JWTError:
-        raise credentials_exception
+        raise credentials_exception(response)
