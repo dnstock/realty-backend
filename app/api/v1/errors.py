@@ -1,7 +1,7 @@
 #
 # Description: Custom error handlers for API v1 exclusively
 #
-# For global or general error handlers see: backend/app/api/errors.py
+# For global or general error handlers see: app/api/errors.py
 #
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse

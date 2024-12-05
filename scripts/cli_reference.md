@@ -12,11 +12,11 @@ docker-compose down
 # rebuild the app
 docker-compose up --build
 
-# (from backend dir) build the image with a different environment
-docker build --build-arg ENVIRONMENT=production -t realty-backend .
+# build the image with a different environment
+docker build --build-arg ENVIRONMENT=production -t realty-api .
 
-# (from backend dir) run the container with a different environment
-docker run -e ENVIRONMENT=production -p 8000:8000 realty-backend
+# run the container with a different environment
+docker run -e ENVIRONMENT=production -p 8000:8000 realty-api
 
 # =========================
 ## APPLICATION

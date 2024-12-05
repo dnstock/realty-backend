@@ -1,7 +1,7 @@
 #
 # Description: Middleware for API v1 exclusively
 #
-# For global or general middleware settings see: backend/app/core/middleware.py
+# For global or general middleware settings see: app/core/middleware.py
 #
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware

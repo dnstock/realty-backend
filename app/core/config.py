@@ -4,8 +4,8 @@ from typing import Literal
 from pydantic import Field, field_validator, ValidationInfo
 from pydantic_settings import BaseSettings
 
-APP_DIR = Path(__file__).resolve().parent.parent  # ./backend/app/
-ROOT_DIR = APP_DIR.parent                         # ./backend/
+APP_DIR = Path(__file__).resolve().parent.parent  # ./app/
+ROOT_DIR = APP_DIR.parent                         # ./
 
 # Check if the app is running in a Docker container
 is_docker_env = Path('/.dockerenv').exists() or (
