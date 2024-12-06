@@ -20,5 +20,9 @@
     "python.analysis.inlayHints.callArgumentNames": "off",
     "python.analysis.extraPaths": [
         "./app"
-    ]
+    ],
+    "github.copilot.enable": {
+        "markdown": true,
+        "scminput": true
+    }
 }
