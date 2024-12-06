@@ -1,10 +1,11 @@
+from datetime import datetime
 from pydantic import ConfigDict, BaseModel as PydanticBaseModel
 from sqlalchemy.orm import Session
 from typing import TYPE_CHECKING, Any, List, TypeVar
 if TYPE_CHECKING:
     from schemas import UserSchema
 
-class BaseModel(PydanticBaseModel):
+class BaseModelConfig(PydanticBaseModel):
     model_config = ConfigDict(
         from_attributes = True,
         validate_assignment = True,
@@ -12,12 +13,20 @@ class BaseModel(PydanticBaseModel):
         str_min_length = 1,
     )
 
-# Generic type for base schemas (e.g. Create schemas)
-T = TypeVar('T', bound=BaseModel)
+# Metadata for all models
+class BaseModel(BaseModelConfig):
+    notes: str | None
+    is_active: bool
+    is_flagged: bool
+    created_at: datetime
+    updated_at: datetime
 
 # Generic schema for models with an id
 class BaseModelWithId(BaseModel):
     id: int
+
+# Generic type for base schemas (e.g. Create schemas)
+T = TypeVar('T', bound=BaseModel)
 
 # Generic type for schemas with an id (e.g. Read and Update schemas)
 Tid = TypeVar('Tid', bound=BaseModelWithId)
@@ -39,7 +48,7 @@ class RequestContext(PydanticBaseModel):
         arbitrary_types_allowed=True,
     )
 
-class AllResults(BaseModel):
+class AllResults(BaseModelConfig):
     rows: List[Any]
     totalCount: int
 

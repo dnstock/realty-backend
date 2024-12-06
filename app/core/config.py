@@ -42,6 +42,8 @@ class Settings(BaseSettings):
     postgres_test_url: str = ''
     sqlalchemy_future: bool = True  # Use the latest features and deprecations
     sqlalchemy_echo: bool = False  # Implementation of postgres_log_queries
+    # Specify the database-specific timestamp function
+    database_timestamp_utc: str = Field(..., description='Database-specific timestamp function')
 
     # JWT and Security Configuration
     jwt_secret_key: str = Field(..., description='JWT secret')

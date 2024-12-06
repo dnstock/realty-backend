@@ -8,7 +8,6 @@ if TYPE_CHECKING:
 class Base(BaseModel):
     name: str
     email: EmailStr
-    is_active: bool | None = None
     password: str
 
     @field_validator('password')
