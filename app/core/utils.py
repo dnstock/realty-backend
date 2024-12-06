@@ -29,6 +29,22 @@ def print_boxed_sections(*sections: list[tuple[str, str]], title: str | None = N
         # Bottom or separating border
         print('+' + '-' * box_width + '+')
 
+# utils.py
+def clean_multiline_string(text: str) -> str:
+    """
+    Cleans a multi-line string by removing leading/trailing whitespace and empty lines.
+
+    Args:
+        text: Multi-line string to clean
+
+    Returns:
+        Clean string with consistent formatting
+    """
+    return "\n".join(
+        line.strip()
+        for line in text.splitlines()
+        if line.strip()
+    )
 
 ## Notifications
 
