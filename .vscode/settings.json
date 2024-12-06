@@ -1,6 +1,6 @@
 {
     "python.analysis.typeCheckingMode": "strict",
-    "python.analysis.autoImportCompletions": false,
+    "python.analysis.autoImportCompletions": true,
     "editor.tokenColorCustomizations": {
         "[Default Dark Modern]": {
             "textMateRules": [
@@ -19,6 +19,6 @@
     "python.analysis.diagnosticMode": "workspace",
     "python.analysis.inlayHints.callArgumentNames": "off",
     "python.analysis.extraPaths": [
-        "./backend/app"
+        "./app"
     ]
 }
