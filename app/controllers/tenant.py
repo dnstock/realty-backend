@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from schemas import TenantSchema
 from db.models import Tenant
-from schemas.base import PaginatedResults
+from schemas.request import PaginatedResults
 from . import base
 
 def get_by_id(db: Session, id: int) -> Tenant | None:

@@ -1,6 +1,6 @@
 from pydantic import Field
-from schemas.base import BaseModel, BaseModelWithId
 from typing import TYPE_CHECKING
+from .base import BaseModel, BaseModelWithId
 if TYPE_CHECKING:
     from schemas import BuildingSchema, LeaseSchema
 

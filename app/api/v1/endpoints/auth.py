@@ -8,7 +8,7 @@ from controllers import UserController
 from schemas import UserSchema
 from db import get_db
 from api.v1.deps import get_request_context_optional
-from schemas.base import RequestContext
+from schemas.request import RequestContext
 
 router: APIRouter = APIRouter()
 

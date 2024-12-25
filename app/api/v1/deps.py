@@ -3,7 +3,8 @@ from sqlalchemy.orm import Session
 from typing import Type, Callable
 from core.oauth2 import get_current_user, get_current_user_optional
 from schemas.user import Read as CurrentUser
-from schemas.base import T, PaginatedResults, RequestContext
+from schemas.request import PaginatedResults, RequestContext
+from schemas.base import T
 from db import models, get_db
 from core.logger import logger, log_exception
 
@@ -40,7 +41,6 @@ def validate_ownership(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail=f'Not authorized to access this {model_name}'
     )
-    logger.info(f'Validating ownership for {model_name} with ID {resource_id} by user {context.current_user}')
     try:
         db_obj = context.db.query(getattr(models, model_name)).filter_by(id=resource_id).one_or_none()
         if db_obj is None:

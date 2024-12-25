@@ -1,6 +1,6 @@
 from pydantic import Field, constr, field_validator
-from schemas.base import BaseModel, BaseModelWithId
 from typing import TYPE_CHECKING, Annotated, Literal
+from .base import BaseModel, BaseModelWithId
 if TYPE_CHECKING:
     from schemas import UserSchema, BuildingSchema
 

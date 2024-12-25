@@ -6,7 +6,7 @@ from core.logger import log_exception
 from schemas import UserSchema
 from db.models import User
 from sqlalchemy.orm import Session
-from schemas.base import PaginatedResults, AllResults
+from schemas.request import PaginatedResults, AllResults
 
 def exists_where(db: Session, key: str, val: Any) -> bool:
     return db.query(exists().where(getattr(User, key) == val)).scalar()
