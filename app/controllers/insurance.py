@@ -14,4 +14,4 @@ def create_and_commit(db: Session, schema: InsuranceSchema.Create, parent_id: in
     return base.create_and_commit(db=db, model=Insurance, schema=schema, parent_key='tenant_id', parent_value=parent_id)
 
 def update_and_commit(db: Session, schema: InsuranceSchema.Update, id: int) -> Insurance | None:
-    return base.update_and_commit(db=db, model=Insurance, schema=schema)
+    return base.update_and_commit(db=db, model=Insurance, schema=schema, id=id)

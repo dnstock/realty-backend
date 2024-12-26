@@ -1,6 +1,6 @@
 from datetime import date
 from typing import TYPE_CHECKING
-from .base import BaseModel, BaseModelWithId
+from .base import BaseModel
 if TYPE_CHECKING:
     from schemas import TenantSchema
 
@@ -15,7 +15,7 @@ class Create(Base):
 class Update(Base, BaseModelWithId):
     pass
 
-class Read(Base, BaseModelWithId):
+class Read(Base):
     tenant: 'TenantSchema.Read'
 
 class ReadFull(Read):

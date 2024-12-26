@@ -1,7 +1,7 @@
 from pydantic import EmailStr, Field, field_validator
 from typing import TYPE_CHECKING
 from core import security
-from .base import BaseModel, BaseModelWithId
+from .base import BaseModel
 if TYPE_CHECKING:
     from schemas import PropertySchema
 
@@ -20,8 +20,8 @@ class Create(Base):
 class Update(Base, BaseModelWithId):
     pass
 
-class Read(Base, BaseModelWithId):
     password: str = Field(exclude=True)
+class Read(Base):
 
 class ReadFull(Read):
     properties: list['PropertySchema.Read'] = Field(default_factory=list)

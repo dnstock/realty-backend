@@ -1,6 +1,6 @@
 from pydantic import Field, StrictInt
 from typing import TYPE_CHECKING, Annotated
-from .base import BaseModel, BaseModelWithId
+from .base import BaseModel
 if TYPE_CHECKING:
     from schemas import PropertySchema, UnitSchema
 
@@ -15,7 +15,7 @@ class Create(Base):
 class Update(Base, BaseModelWithId):
     pass
 
-class Read(Base, BaseModelWithId):
+class Read(Base):
     property: 'PropertySchema.Read'
 
 class ReadFull(Read):

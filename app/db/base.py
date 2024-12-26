@@ -1,7 +1,6 @@
 from datetime import datetime
 from sqlalchemy import String, TIMESTAMP, text
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped
-from typing import TypeVar
 from core.types import BooleanInteger
 from core import settings
 
@@ -19,5 +18,3 @@ class Base(DeclarativeBase):
         TIMESTAMP(timezone=True), nullable=False, server_default=text(settings.database_timestamp_utc)
     )
 
-# Define a generic type for models
-T = TypeVar('T', bound=Base)

@@ -14,4 +14,4 @@ def create_and_commit(db: Session, schema: PropertySchema.Create, parent_id: int
     return base.create_and_commit(db=db, model=Property, schema=schema, parent_key='manager_id', parent_value=parent_id)
 
 def update_and_commit(db: Session, schema: PropertySchema.Update, id: int) -> Property | None:
-    return base.update_and_commit(db=db, model=Property, schema=schema)
+    return base.update_and_commit(db=db, model=Property, schema=schema, id=id)

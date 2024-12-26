@@ -1,7 +1,7 @@
 from pydantic import Field
 from datetime import date
 from typing import TYPE_CHECKING
-from .base import BaseModel, BaseModelWithId
+from .base import BaseModel
 if TYPE_CHECKING:
     from schemas import UnitSchema, TenantSchema
 
@@ -16,7 +16,7 @@ class Create(Base):
 class Update(Base, BaseModelWithId):
     pass
 
-class Read(Base, BaseModelWithId):
+class Read(Base):
     unit: 'UnitSchema.Read'
 
 class ReadFull(Read):

@@ -10,7 +10,7 @@ class RequestContext(PydanticBaseModel):
     db: Session
 
     def get_user_id(self) -> int:
-        return self.current_user.id if self.current_user else 0
+        return self.current_user.id if self.current_user and self.current_user.id else 0
 
     def is_user_active(self) -> bool:
         return bool(self.current_user and self.current_user.is_active)

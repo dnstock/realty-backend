@@ -1,6 +1,6 @@
 from pydantic import Field, constr, field_validator
 from typing import TYPE_CHECKING, Annotated, Literal
-from .base import BaseModel, BaseModelWithId
+from .base import BaseModel
 if TYPE_CHECKING:
     from schemas import UserSchema, BuildingSchema
 
@@ -27,7 +27,7 @@ class Create(Base):
 class Update(Base, BaseModelWithId):
     pass
 
-class Read(Base, BaseModelWithId):
+class Read(Base):
     manager: 'UserSchema.Read'
 
 class ReadFull(Read):

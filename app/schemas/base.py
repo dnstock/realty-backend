@@ -17,16 +17,12 @@ class BaseModel(BaseModelConfig):
     is_flagged: bool
     created_at: datetime
     updated_at: datetime
+    id: int | None = None
 
-# Generic schema for models with an id
-class BaseModelWithId(BaseModel):
-    id: int
 
 # Generic type for base schemas (e.g. Create schemas)
-T = TypeVar('T', bound=BaseModel)
+T = TypeVar('T', infer_variance=True, bound=BaseModel)
 
-# Generic type for schemas with an id (e.g. Read and Update schemas)
-Tid = TypeVar('Tid', bound=BaseModelWithId)
 
 
 

@@ -54,9 +54,9 @@ def create_and_commit(db: Session, schema: UserSchema.Create) -> User | None:
         db.rollback()
         return None
 
-def update_and_commit(db: Session, schema: UserSchema.Update) -> User | None:
+def update_and_commit(db: Session, schema: UserSchema.Update, id: int) -> User | None:
     try:
-        user = db.query(User).filter(User.id == schema.id).one()
+        user = db.query(User).filter(User.id == id).one()
         for key, value in schema.model_dump(
             exclude_unset=True,
             exclude={'id'},
