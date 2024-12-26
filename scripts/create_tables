@@ -1,0 +1,17 @@
+#!/bin/bash
+
+usage() {
+    echo "Usage: $0 <database_name>"
+    echo "Example: $0 realty_test"
+    exit 1
+}
+
+# Check if database parameter provided
+if [ $# -ne 1 ]; then
+    usage
+fi
+
+DATABASE_NAME=$1
+
+# Execute Python script with mockdata file
+PYTHONPATH=./app python scripts/create_tables.py "$DATABASE_NAME"
