@@ -12,12 +12,12 @@ class BaseModelConfig(PydanticBaseModel):
 
 # Metadata for all models
 class BaseModel(BaseModelConfig):
-    notes: str | None
-    is_active: bool
-    is_flagged: bool
-    created_at: datetime
-    updated_at: datetime
     id: int | None = None
+    notes: str | None = None
+    is_active: bool = True
+    is_flagged: bool = False
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
 
 # Generic type for base schemas (e.g. Create schemas)
