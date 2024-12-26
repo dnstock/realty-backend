@@ -88,3 +88,6 @@ alembic/versions/__pycache__/
 
 # Test SQLite database
 test.db
+
+# Mock data files
+mockdata_*.json

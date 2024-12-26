@@ -1,0 +1,24 @@
+#!/bin/bash
+
+usage() {
+    echo "Usage: $0 <target_database_name> <mockdata_filename>"
+    echo "Example: $0 realty_test mockdata_1234567890.json"
+    exit 1
+}
+
+# Check if filename parameter provided
+if [ $# -ne 2 ]; then
+    usage
+fi
+
+TARGET_DATABASE_NAME=$1
+MOCKDATA_FILE=$2
+
+# Check if file exists and is readable
+if [ ! -r "$MOCKDATA_FILE" ]; then
+    echo "Error: File '$MOCKDATA_FILE' does not exist or is not readable"
+    exit 2
+fi
+
+# Execute Python script with mockdata file
+PYTHONPATH=./app python scripts/load_mockdata_sqlalchemy.py "$TARGET_DATABASE_NAME" "$MOCKDATA_FILE"
