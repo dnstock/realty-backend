@@ -58,9 +58,11 @@ def verify_token(db: Session, token: str, response: Response) -> UserSchema.Read
         email = payload.get('sub')
         if not email:
             raise credentials_exception(response)
+
     except ExpiredSignatureError:
         # Re-raise to allow get_current_user to handle token expiration
         raise
+
     except JWTError as exc:
         # Log and raise for any other JWT-related errors
         log_exception(exc, 'Error decoding token')
@@ -109,6 +111,9 @@ def get_current_user(
             create_and_set_token_cookie(response=response, token_type='access', data={'sub': email})
 
             return UserSchema.Read.model_validate(user)
+
+        except ExpiredSignatureError:
+            raise credentials_exception(response)
 
         except JWTError as exc:
             log_exception(exc, 'Error decoding refresh token')
