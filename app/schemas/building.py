@@ -8,6 +8,12 @@ if TYPE_CHECKING:
 class Base(BaseModel):
     name: str
     unit_count: Annotated[StrictInt, Field(gt=0)]
+    floor_count: Annotated[StrictInt, Field(gt=0)]
+    has_elevator: bool = False
+    has_pool: bool = False
+    has_gym: bool = False
+    has_parking: bool = False
+    has_doorman: bool = False
     property_id: int
 
 class Create(Base):
