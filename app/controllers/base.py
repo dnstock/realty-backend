@@ -43,7 +43,7 @@ def get_all_paginated(db: Session, model: Type[T], parent_key: str, parent_value
 def create_and_commit(db: Session, model: Type[T], schema: BaseModel, parent_key: str, parent_value: int) -> T | None:
     try:
         db_obj = model(**schema.model_dump(exclude_unset=True))
-        db_obj.__setattr__(parent_key, parent_value)
+        setattr(db_obj, parent_key, parent_value)
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
@@ -61,11 +61,12 @@ def update_and_commit(db: Session, model: Type[T], schema: BaseModel, id: int) -
     try:
         db_obj = db.query(model).filter(getattr(model, 'id') == id).one()
 
-        primary_key = {key.name for key in getattr(model, '__table__').primary_key}
+        primary_key = {str(key.name) for key in model.__table__.primary_key}
+        foreign_keys = {str(key.name) for key in model.__table__.foreign_keys}
 
         for key, value in schema.model_dump(
             exclude_unset=True,
-            exclude=primary_key,
+            exclude=primary_key | foreign_keys,
         ).items():
             setattr(db_obj, key, value)
 
