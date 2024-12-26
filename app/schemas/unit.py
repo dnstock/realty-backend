@@ -6,7 +6,12 @@ if TYPE_CHECKING:
     from schemas import BuildingSchema, LeaseSchema
 
 class Base(BaseModel):
-    number: str
+    unit_number: str
+    floor_number: int
+    bedrooms: int
+    bathrooms: float
+    sqft: int
+    is_vacant: bool = True
     building_id: int
 
 class Create(Base):
