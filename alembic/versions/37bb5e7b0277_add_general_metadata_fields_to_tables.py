@@ -9,7 +9,6 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-from core.types import BooleanInteger
 
 # revision identifiers, used by Alembic.
 revision: str = '37bb5e7b0277'
@@ -23,8 +22,8 @@ def upgrade() -> None:
     op.execute("CREATE OR REPLACE FUNCTION set_updated_at()\nRETURNS trigger AS $$\nBEGIN\nNEW.updated_at = timezone('utc', now());\nRETURN NEW;\nEND;\n$$ LANGUAGE plpgsql;")
     with op.batch_alter_table('buildings', schema=None) as batch_op:
         batch_op.add_column(sa.Column('notes', sa.String(), nullable=True))
-        batch_op.add_column(sa.Column('is_active', BooleanInteger(), server_default='1', nullable=False))
-        batch_op.add_column(sa.Column('is_flagged', BooleanInteger(), server_default='0', nullable=False))
+        batch_op.add_column(sa.Column('is_active', sa.Boolean(), server_default='true', nullable=False))
+        batch_op.add_column(sa.Column('is_flagged', sa.Boolean(), server_default='false', nullable=False))
         batch_op.add_column(sa.Column('created_at', sa.TIMESTAMP(timezone=True), server_default=sa.text("timezone('utc', now())"), nullable=False))
         batch_op.add_column(sa.Column('updated_at', sa.TIMESTAMP(timezone=True), server_default=sa.text("timezone('utc', now())"), nullable=False))
         batch_op.create_index(batch_op.f('ix_buildings_created_at'), ['created_at'], unique=False)
@@ -33,8 +32,8 @@ def upgrade() -> None:
 
     with op.batch_alter_table('insurances', schema=None) as batch_op:
         batch_op.add_column(sa.Column('notes', sa.String(), nullable=True))
-        batch_op.add_column(sa.Column('is_active', BooleanInteger(), server_default='1', nullable=False))
-        batch_op.add_column(sa.Column('is_flagged', BooleanInteger(), server_default='0', nullable=False))
+        batch_op.add_column(sa.Column('is_active', sa.Boolean(), server_default='true', nullable=False))
+        batch_op.add_column(sa.Column('is_flagged', sa.Boolean(), server_default='false', nullable=False))
         batch_op.add_column(sa.Column('created_at', sa.TIMESTAMP(timezone=True), server_default=sa.text("timezone('utc', now())"), nullable=False))
         batch_op.add_column(sa.Column('updated_at', sa.TIMESTAMP(timezone=True), server_default=sa.text("timezone('utc', now())"), nullable=False))
         batch_op.create_index(batch_op.f('ix_insurances_created_at'), ['created_at'], unique=False)
@@ -43,8 +42,8 @@ def upgrade() -> None:
 
     with op.batch_alter_table('leases', schema=None) as batch_op:
         batch_op.add_column(sa.Column('notes', sa.String(), nullable=True))
-        batch_op.add_column(sa.Column('is_active', BooleanInteger(), server_default='1', nullable=False))
-        batch_op.add_column(sa.Column('is_flagged', BooleanInteger(), server_default='0', nullable=False))
+        batch_op.add_column(sa.Column('is_active', sa.Boolean(), server_default='true', nullable=False))
+        batch_op.add_column(sa.Column('is_flagged', sa.Boolean(), server_default='false', nullable=False))
         batch_op.add_column(sa.Column('created_at', sa.TIMESTAMP(timezone=True), server_default=sa.text("timezone('utc', now())"), nullable=False))
         batch_op.add_column(sa.Column('updated_at', sa.TIMESTAMP(timezone=True), server_default=sa.text("timezone('utc', now())"), nullable=False))
         batch_op.create_index(batch_op.f('ix_leases_created_at'), ['created_at'], unique=False)
@@ -53,8 +52,8 @@ def upgrade() -> None:
 
     with op.batch_alter_table('properties', schema=None) as batch_op:
         batch_op.add_column(sa.Column('notes', sa.String(), nullable=True))
-        batch_op.add_column(sa.Column('is_active', BooleanInteger(), server_default='1', nullable=False))
-        batch_op.add_column(sa.Column('is_flagged', BooleanInteger(), server_default='0', nullable=False))
+        batch_op.add_column(sa.Column('is_active', sa.Boolean(), server_default='true', nullable=False))
+        batch_op.add_column(sa.Column('is_flagged', sa.Boolean(), server_default='false', nullable=False))
         batch_op.add_column(sa.Column('created_at', sa.TIMESTAMP(timezone=True), server_default=sa.text("timezone('utc', now())"), nullable=False))
         batch_op.add_column(sa.Column('updated_at', sa.TIMESTAMP(timezone=True), server_default=sa.text("timezone('utc', now())"), nullable=False))
         batch_op.create_index(batch_op.f('ix_properties_created_at'), ['created_at'], unique=False)
@@ -63,8 +62,8 @@ def upgrade() -> None:
 
     with op.batch_alter_table('tenants', schema=None) as batch_op:
         batch_op.add_column(sa.Column('notes', sa.String(), nullable=True))
-        batch_op.add_column(sa.Column('is_active', BooleanInteger(), server_default='1', nullable=False))
-        batch_op.add_column(sa.Column('is_flagged', BooleanInteger(), server_default='0', nullable=False))
+        batch_op.add_column(sa.Column('is_active', sa.Boolean(), server_default='true', nullable=False))
+        batch_op.add_column(sa.Column('is_flagged', sa.Boolean(), server_default='false', nullable=False))
         batch_op.add_column(sa.Column('created_at', sa.TIMESTAMP(timezone=True), server_default=sa.text("timezone('utc', now())"), nullable=False))
         batch_op.add_column(sa.Column('updated_at', sa.TIMESTAMP(timezone=True), server_default=sa.text("timezone('utc', now())"), nullable=False))
         batch_op.create_index(batch_op.f('ix_tenants_created_at'), ['created_at'], unique=False)
@@ -73,8 +72,8 @@ def upgrade() -> None:
 
     with op.batch_alter_table('units', schema=None) as batch_op:
         batch_op.add_column(sa.Column('notes', sa.String(), nullable=True))
-        batch_op.add_column(sa.Column('is_active', BooleanInteger(), server_default='1', nullable=False))
-        batch_op.add_column(sa.Column('is_flagged', BooleanInteger(), server_default='0', nullable=False))
+        batch_op.add_column(sa.Column('is_active', sa.Boolean(), server_default='true', nullable=False))
+        batch_op.add_column(sa.Column('is_flagged', sa.Boolean(), server_default='false', nullable=False))
         batch_op.add_column(sa.Column('created_at', sa.TIMESTAMP(timezone=True), server_default=sa.text("timezone('utc', now())"), nullable=False))
         batch_op.add_column(sa.Column('updated_at', sa.TIMESTAMP(timezone=True), server_default=sa.text("timezone('utc', now())"), nullable=False))
         batch_op.create_index(batch_op.f('ix_units_created_at'), ['created_at'], unique=False)
@@ -83,7 +82,7 @@ def upgrade() -> None:
 
     with op.batch_alter_table('users', schema=None) as batch_op:
         batch_op.add_column(sa.Column('notes', sa.String(), nullable=True))
-        batch_op.add_column(sa.Column('is_flagged', BooleanInteger(), server_default='0', nullable=False))
+        batch_op.add_column(sa.Column('is_flagged', sa.Boolean(), server_default='false', nullable=False))
         batch_op.add_column(sa.Column('created_at', sa.TIMESTAMP(timezone=True), server_default=sa.text("timezone('utc', now())"), nullable=False))
         batch_op.add_column(sa.Column('updated_at', sa.TIMESTAMP(timezone=True), server_default=sa.text("timezone('utc', now())"), nullable=False))
         batch_op.create_index(batch_op.f('ix_users_created_at'), ['created_at'], unique=False)

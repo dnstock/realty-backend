@@ -1,7 +1,7 @@
 """Initial migration
 
 Revision ID: a9619b65924a
-Revises: 
+Revises:
 Create Date: 2024-09-08 19:20:07.180254
 
 """
@@ -25,7 +25,7 @@ def upgrade() -> None:
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('email', sa.String(length=255), nullable=False),
     sa.Column('password', sa.String(length=128), nullable=False),
-    sa.Column('is_active', sa.Integer(), nullable=False, server_default='1'),
+    sa.Column('is_active', sa.Boolean(), nullable=False, server_default='true'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
