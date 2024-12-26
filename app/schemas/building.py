@@ -1,6 +1,7 @@
 from pydantic import Field, StrictInt
 from typing import TYPE_CHECKING, Annotated
 from .base import BaseModel
+from .utils.partial_models import make_partial_model
 if TYPE_CHECKING:
     from schemas import PropertySchema, UnitSchema
 
@@ -12,7 +13,7 @@ class Base(BaseModel):
 class Create(Base):
     pass
 
-class Update(Base, BaseModelWithId):
+class Update(make_partial_model(Base)):
     pass
 
 class Read(Base):

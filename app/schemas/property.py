@@ -1,6 +1,7 @@
 from pydantic import Field, constr, field_validator
 from typing import TYPE_CHECKING, Annotated, Literal
 from .base import BaseModel
+from .utils.partial_models import make_partial_model
 if TYPE_CHECKING:
     from schemas import UserSchema, BuildingSchema
 
@@ -24,7 +25,7 @@ class Base(BaseModel):
 class Create(Base):
     pass
 
-class Update(Base, BaseModelWithId):
+class Update(make_partial_model(Base)):
     pass
 
 class Read(Base):

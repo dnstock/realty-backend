@@ -1,6 +1,7 @@
 from datetime import date
 from typing import TYPE_CHECKING
 from .base import BaseModel
+from .utils.partial_models import make_partial_model
 if TYPE_CHECKING:
     from schemas import TenantSchema
 
@@ -12,7 +13,7 @@ class Base(BaseModel):
 class Create(Base):
     pass
 
-class Update(Base, BaseModelWithId):
+class Update(make_partial_model(Base)):
     pass
 
 class Read(Base):

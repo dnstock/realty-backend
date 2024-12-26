@@ -2,6 +2,7 @@ from pydantic import EmailStr, Field, field_validator
 from typing import TYPE_CHECKING
 from core import security
 from .base import BaseModel
+from .utils.partial_models import make_partial_model
 if TYPE_CHECKING:
     from schemas import PropertySchema
 
@@ -17,7 +18,7 @@ class Base(BaseModel):
 class Create(Base):
     pass
 
-class Update(Base, BaseModelWithId):
+class Update(make_partial_model(Base)):
     pass
 
     password: str = Field(exclude=True)
