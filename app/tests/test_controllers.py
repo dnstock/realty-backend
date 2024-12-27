@@ -26,7 +26,7 @@ from schemas import (
 )
 
 @pytest.fixture(scope='module')
-def test_db():
+def test_db_sqlite():
     db_name = 'test.db'
     engine = create_engine(f'sqlite:///./{db_name}')  # Use an in-memory database
     TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -39,6 +39,19 @@ def test_db():
         Base.metadata.drop_all(bind=engine)
         if Path(db_name).exists():
             Path(db_name).unlink()  # Remove the database file
+
+@pytest.fixture(scope='module')
+def test_db():
+    engine = create_engine('postgresql+psycopg://admin:admin@localhost/realty_test')
+    TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+    db = TestingSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+        Base.metadata.drop_all(bind=engine)
 
 # Generate a unique email addresses
 def generate_test_email():
