@@ -32,15 +32,15 @@ def get_by_email(db: Session, email: str) -> User | None:
 
 def get_all(db: Session) -> AllResults:
     query = db.query(User)
-    totalCount = query.count()
+    rowCount = query.count()
     rows = query.all()
-    return AllResults(rows=rows, totalCount=totalCount)
+    return AllResults(rows=rows, rowCount=rowCount)
 
 def get_all_paginated(db: Session, skip: int = 0, limit: int = 10) -> PaginatedResults:
     query = db.query(User)
-    totalCount = query.count()
+    rowCount = query.count()
     rows = query.offset(skip).limit(limit).all()
-    return PaginatedResults(rows=rows, totalCount=totalCount, pageStart=min(skip, totalCount), pageEnd=min(skip + limit, totalCount))
+    return PaginatedResults(rows=rows, rowCount=rowCount, pageStart=min(skip, rowCount), pageEnd=min(skip + limit, rowCount))
 
 def create_and_commit(db: Session, schema: UserSchema.Create) -> User | None:
     try:

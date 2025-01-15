@@ -30,15 +30,15 @@ def get_by_id(db: Session, model: Type[T], id: int) -> T | None:
 
 def get_all(db: Session, model: Type[T], parent_key: str, parent_value: int) -> AllResults:
     query = db.query(model).filter(getattr(model, parent_key) == parent_value)
-    totalCount = query.count()
+    rowCount = query.count()
     rows = query.all()
-    return AllResults(rows=rows, totalCount=totalCount)
+    return AllResults(rows=rows, rowCount=rowCount)
 
 def get_all_paginated(db: Session, model: Type[T], parent_key: str, parent_value: int, skip: int = 0, limit: int = 10) -> PaginatedResults:
     query = db.query(model).filter(getattr(model, parent_key) == parent_value)
-    totalCount = query.count()
+    rowCount = query.count()
     rows = query.offset(skip).limit(limit).all()
-    return PaginatedResults(rows=rows, totalCount=totalCount, pageStart=min(skip, totalCount), pageEnd=min(skip + limit, totalCount))
+    return PaginatedResults(rows=rows, rowCount=rowCount, pageStart=min(skip, rowCount), pageEnd=min(skip + limit, rowCount))
 
 def create_and_commit(db: Session, model: Type[T], schema: BaseModel, parent_key: str, parent_value: int) -> T | None:
     try:

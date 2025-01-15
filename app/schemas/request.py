@@ -24,7 +24,7 @@ class RequestContext(PydanticBaseModel):
 
 class AllResults(BaseModelConfig):
     rows: List[Any]
-    totalCount: int
+    rowCount: int
 
 class PaginatedResults(AllResults):
     pageStart: int
