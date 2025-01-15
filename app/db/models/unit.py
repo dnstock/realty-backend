@@ -7,6 +7,8 @@ if TYPE_CHECKING:
 
 class Unit(Base):
     __tablename__ = 'units'
+    _resource_parent = 'building'
+    _resource_child = 'lease'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
     unit_number: Mapped[int] = mapped_column(String, nullable=False)

@@ -7,6 +7,8 @@ if TYPE_CHECKING:
 
 class Property(Base):
     __tablename__ = 'properties'
+    _resource_parent = 'manager'
+    _resource_child = 'building'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String, index=True)

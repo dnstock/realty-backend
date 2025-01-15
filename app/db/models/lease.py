@@ -7,6 +7,8 @@ if TYPE_CHECKING:
 
 class Lease(Base):
     __tablename__ = 'leases'
+    _resource_parent = 'unit'
+    _resource_child = 'tenant'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
     start_date: Mapped[Date] = mapped_column(Date)

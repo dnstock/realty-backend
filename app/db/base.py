@@ -17,3 +17,18 @@ class Base(DeclarativeBase):
         TIMESTAMP(timezone=True), nullable=False, server_default=text(settings.database_timestamp_utc)
     )
 
+    _resource_parent: str | None = None
+    _resource_child: str | None = None
+
+    @property
+    def _resource(self) -> str:
+        return self.__class__.__module__.lower().split('.')[-1]
+
+    @property
+    def resource_info(self) -> dict[str, str | None]:
+        return {
+            'name': self._resource,
+            'parent': self._resource_parent,
+            'child': self._resource_child,
+            '__table__': self.__tablename__,
+        }

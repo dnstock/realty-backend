@@ -7,6 +7,7 @@ if TYPE_CHECKING:
 
 class Insurance(Base):
     __tablename__ = 'insurances'
+    _resource_parent = 'tenant'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
     policy_number: Mapped[str] = mapped_column(String, index=True)
