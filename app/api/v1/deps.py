@@ -1,6 +1,7 @@
 from fastapi import HTTPException, status, Depends
 from sqlalchemy.orm import Session
-from typing import Type, Callable
+from typing import Type, Any
+from functools import lru_cache
 from core.oauth2 import get_current_user, get_current_user_optional
 from schemas.user import Read as CurrentUser
 from schemas.request import PaginatedResults, RequestContext
@@ -31,43 +32,53 @@ def serialize_results(
     results.rows = [schema.model_validate(item) for item in results.rows]
     return results
 
+# Static mapping of model paths to manager_id
+OWNER_PATHS = {
+    'Property': 'manager_id',
+    'Building': 'property.manager_id',
+    'Unit': 'building.property.manager_id',
+    'Lease': 'unit.building.property.manager_id',
+    'Tenant': 'lease.unit.building.property.manager_id',
+    'Insurance': 'tenant.lease.unit.building.property.manager_id',
+}
+
 # Validate ownership of parent resource
 def validate_ownership(
     model_name: str,
     resource_id: int,
     context: RequestContext = Depends(get_request_context),
 ) -> None:
+    @lru_cache(maxsize=128)
+    def get_owner_id(obj: Any, path: str) -> int:
+        """Navigate object relationships using cached path"""
+        value = obj
+        for attr in path.split('.'):
+            value = getattr(value, attr)
+        return value
+
     access_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail=f'Not authorized to access this {model_name}'
     )
+
     try:
-        db_obj = context.db.query(getattr(models, model_name)).filter_by(id=resource_id).one_or_none()
-        if db_obj is None:
-            logger.error(f'{model_name} with ID {resource_id} not found')
+        # Get model and validate existence
+        model_class = getattr(models, model_name)
+        db_obj = context.db.query(model_class).filter_by(id=resource_id).one_or_none()
+        if not db_obj:
             raise access_exception
 
-        owner_map: dict[str, Callable[[object], int]] = {
-            'Property': lambda obj: obj.manager_id, # type: ignore
-            'Building': lambda obj: obj.property.manager_id, # type: ignore
-            'Unit': lambda obj: obj.building.property.manager_id, # type: ignore
-            'Lease': lambda obj: obj.unit.building.property.manager_id, # type: ignore
-            'Tenant': lambda obj: obj.lease.unit.building.property.manager_id, # type: ignore
-            'Insurance': lambda obj: obj.tenant.lease.unit.building.property.manager_id, # type: ignore
-        }
-
-        owner_id = owner_map.get(model_name)
-        if owner_id is None:
+        # Get and validate owner path
+        owner_path = OWNER_PATHS.get(model_name)
+        if not owner_path:
             logger.error(f'Ownership validation not supported for {model_name}')
             raise access_exception
 
-        if owner_id(db_obj) != context.get_user_id():
-            logger.warning(f'User {context.get_user_id()} does not have permission to access {model_name} with ID {resource_id}')
+        # Compare owner IDs
+        if get_owner_id(db_obj, owner_path) != context.get_user_id():
+            logger.warning(f'User {context.get_user_id()} denied access to {model_name} {resource_id}')
             raise access_exception
 
-    except AttributeError as exc:
-        log_exception(exc, 'Attribute error during ownership validation')
-        raise access_exception
     except Exception as exc:
-        log_exception(exc, 'Error during ownership validation')
+        log_exception(exc, 'Ownership validation failed')
         raise access_exception
