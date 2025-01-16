@@ -1,11 +1,11 @@
 from sqlalchemy import Integer, String, ForeignKey, Boolean
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from typing import TYPE_CHECKING
-from db import Base
+from db import ResourceBase
 if TYPE_CHECKING:
     from models import Property, Unit
 
-class Building(Base):
+class Building(ResourceBase):
     __tablename__ = 'buildings'
     _resource_parent = 'property'
     _resource_child = 'unit'
