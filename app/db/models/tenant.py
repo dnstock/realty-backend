@@ -13,7 +13,7 @@ class Tenant(ResourceBase):
     name: Mapped[str] = mapped_column(String, index=True)
     email: Mapped[str] = mapped_column(String, index=True, unique=True)
     phone: Mapped[str] = mapped_column(String, index=True)
-    lease_id: Mapped[int] = mapped_column(ForeignKey('leases.id'))
+    lease_id: Mapped[int] = mapped_column(ForeignKey('leases.id'), index=True, nullable=False)
 
     lease: Mapped['Lease'] = relationship('Lease', back_populates='tenants')
     insurances: Mapped[list['Insurance']] = relationship('Insurance', back_populates='tenant')

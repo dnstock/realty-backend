@@ -18,7 +18,7 @@ class Building(ResourceBase):
     has_gym: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default='false')
     has_parking: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default='false')
     has_doorman: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default='false')
-    property_id: Mapped[int] = mapped_column(ForeignKey('properties.id'))
+    property_id: Mapped[int] = mapped_column(ForeignKey('properties.id'), index=True, nullable=False)
 
     property: Mapped['Property'] = relationship('Property', back_populates='buildings')
     units: Mapped[list['Unit']] = relationship('Unit', back_populates='building')

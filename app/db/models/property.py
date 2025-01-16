@@ -16,7 +16,7 @@ class Property(ResourceBase):
     state: Mapped[str] = mapped_column(String, index=True)
     zip_code: Mapped[str] = mapped_column(String, index=True)
     type: Mapped[str] = mapped_column(String, index=True)
-    manager_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    manager_id: Mapped[int] = mapped_column(ForeignKey('users.id'), index=True, nullable=False)
 
     manager: Mapped['User'] = relationship('User', back_populates='properties')
     buildings: Mapped[list['Building']] = relationship('Building', back_populates='property')

@@ -13,7 +13,7 @@ class Lease(ResourceBase):
     start_date: Mapped[Date] = mapped_column(Date)
     end_date: Mapped[Date] = mapped_column(Date)
     rent: Mapped[float] = mapped_column(Float)
-    unit_id: Mapped[int] = mapped_column(ForeignKey('units.id'))
+    unit_id: Mapped[int] = mapped_column(ForeignKey('units.id'), index=True, nullable=False)
 
     unit: Mapped['Unit'] = relationship('Unit', back_populates='leases')
     tenants: Mapped[list['Tenant']] = relationship('Tenant', back_populates='lease')

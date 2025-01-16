@@ -16,7 +16,7 @@ class Unit(ResourceBase):
     bathrooms: Mapped[float] = mapped_column(Float)
     sqft: Mapped[int] = mapped_column(Integer)
     is_vacant: Mapped[bool] = mapped_column(Boolean, index=True, nullable=False, server_default='true')
-    building_id: Mapped[int] = mapped_column(ForeignKey('buildings.id'))
+    building_id: Mapped[int] = mapped_column(ForeignKey('buildings.id'), index=True, nullable=False)
 
     building: Mapped['Building'] = relationship('Building', back_populates='units')
     leases: Mapped[list['Lease']] = relationship('Lease', back_populates='unit')
