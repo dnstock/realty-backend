@@ -6,6 +6,8 @@ from .base import Base
 class ResourceBase(Base):
     __abstract__ = True
 
+    owner_id: Mapped[int] = mapped_column(ForeignKey('users.id'), index=True, nullable=False)
+
     _resource_parent: str | None = None
     _resource_child: str | None = None
 
