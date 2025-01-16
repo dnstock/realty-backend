@@ -1,10 +1,11 @@
 from datetime import datetime
-from sqlalchemy import String, Boolean, TIMESTAMP, text
+from sqlalchemy import Integer, String, Boolean, TIMESTAMP, text
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped
 from core import settings
 
 # Base class with metadata for models
 class Base(DeclarativeBase):
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
     is_active: Mapped[bool] = mapped_column(Boolean, index=True, nullable=False, server_default=text('true'))
     is_flagged: Mapped[bool] = mapped_column(Boolean, index=True, nullable=False, server_default=text('false'))
     notes: Mapped[str] = mapped_column(String, nullable=True)

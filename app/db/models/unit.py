@@ -10,7 +10,6 @@ class Unit(Base):
     _resource_parent = 'building'
     _resource_child = 'lease'
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
     unit_number: Mapped[int] = mapped_column(String, nullable=False)
     floor_number: Mapped[int] = mapped_column(Integer, nullable=False)
     bedrooms: Mapped[int] = mapped_column(Integer)

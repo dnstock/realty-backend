@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, String, ForeignKey
+from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from typing import TYPE_CHECKING
 from db import Base
@@ -10,7 +10,6 @@ class Tenant(Base):
     _resource_parent = 'lease'
     _resource_child = 'insurance'
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String, index=True)
     email: Mapped[str] = mapped_column(String, index=True, unique=True)
     phone: Mapped[str] = mapped_column(String, index=True)

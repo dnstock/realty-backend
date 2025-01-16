@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, Date, ForeignKey, Float
+from sqlalchemy import Date, ForeignKey, Float
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from typing import TYPE_CHECKING
 from db import Base
@@ -10,7 +10,6 @@ class Lease(Base):
     _resource_parent = 'unit'
     _resource_child = 'tenant'
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
     start_date: Mapped[Date] = mapped_column(Date)
     end_date: Mapped[Date] = mapped_column(Date)
     rent: Mapped[float] = mapped_column(Float)
