@@ -5,11 +5,39 @@ import json
 from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 
-fake = Faker()
-
 # User -> Property -> Building -> Unit -> Lease -> Tenant -> Insurance
 
-count_per_table = 50
+# True = Start IDs as defined below
+# False = Start all IDs at 1 (ignores below)
+USE_ID_STARTS = False
+
+# Start IDs for each table (if appending to existing data)
+user_id_start = 51
+property_id_start = 51
+building_id_start = 51
+unit_id_start = 51
+lease_id_start = 51
+tenant_id_start = 51
+insurance_id_start = 51
+
+# Number of records to generate for each table
+users_per_table = random.randint(10, 30)
+properties_per_table = random.randint(50, 100)
+buildings_per_table = random.randint(500, 1000)
+units_per_table = random.randint(3000, 8000)
+leases_per_table = random.randint(3000, 8000)
+tenants_per_table = random.randint(3000, 8000)
+insurances_per_table = random.randint(3000, 8000)
+
+
+""" NO CHANGES NEEDED BELOW THIS LINE """
+
+fake = Faker()
+
+suffix = input('Enter a suffix for the filename (default: YYYYMMDD): ')
+suffix = suffix if suffix else datetime.now().strftime('%Y%m%d')
+filename = f'mockdata_{suffix}.json'
+
 total_generated = 0
 
 # Storage for foreign key relationships
@@ -24,14 +52,14 @@ insurance_ids = []
 # this encrypted password = 'dan'
 password_dan = '$2b$12$h7Vc0GuUPiSDQ5CoGX7e4Okro4ZYM/LZPXsVo./4uUhG.SybOHG.6'
 
-user0 = {
+user1 = {
     'id': 1,
     'name': 'Dan Hart',
     'email': 'dnstock8@gmail.com',
-    'password': password_dan
+    'password': password_dan,
 }
 
-property0 = {
+property1 = {
     'id': 1,
     'name': 'The Jefferson',
     'address': '2 Kinderkamack Rd',
@@ -39,40 +67,55 @@ property0 = {
     'state': 'NJ',
     'zip_code': '07601',
     'type': 'Commercial',
-    'manager': 'Dan Hart'
+    'manager': 'Dan Hart',
+    'owner_id': 1,
 }
 
+def _generate_metadata(id):
+    return {
+        'id': id,
+        'owner_id': 1,  # me
+        'is_active': True if random.random() < 0.9 else False,  # ~10% are inactive
+        'is_flagged': True if random.random() < 0.1 else False,  # ~10% are flagged
+        'notes': fake.text() if random.random() < 0.3 else None,  # ~30% have notes
+    }
+
 # Generate Users
-def generate_users(count=count_per_table):
+def generate_users(count=users_per_table):
     global total_generated
     global user_ids
     users = []
     for i in range(count):
-        if i == 0:
-            user = user0
+        id = user_id_start + i if USE_ID_STARTS else i + 1
+        if id == 1:
+            user = user1
         else:
             user = {
-                'id': i + 1,
+                'id': id,
                 'name': fake.name(),
-                'email': f'user{i+1}@example.com',
-                'password': password_dan
+                'email': f'user{id}@example.com',
+                'password': password_dan,
+                'is_active': True if random.random() < 0.6 else False, # ~40% are inactive
+                'is_flagged': True if random.random() < 0.2 else False, # ~20% are flagged
+                'notes': fake.text() if random.random() < 0.3 else None,  # ~30% have notes
             }
         users.append(user)
         user_ids.append(user['id'])
     total_generated += count
     return users
 
-# Generate Properties (FK -> User)
-def generate_properties(count=count_per_table):
+# Generate Properties
+def generate_properties(count=properties_per_table):
     global total_generated
     global property_ids
     properties = []
     for i in range(count):
-        if i == 0:
-            property_ = property0
+        id = property_id_start + i if USE_ID_STARTS else i + 1
+        if id == 1:
+            property_ = property1
         else:
             property_ = {
-                'id': i + 1,
+                **_generate_metadata(id),
                 'name': fake.company(),
                 'address': fake.address().replace('\n', ', '),
                 'city': fake.city(),
@@ -87,15 +130,15 @@ def generate_properties(count=count_per_table):
     return properties
 
 # Generate Buildings (FK -> Property)
-def generate_buildings(count=count_per_table):
+def generate_buildings(count=buildings_per_table):
     global total_generated
     global building_ids
     buildings = []
     for i in range(count):
+        id = building_id_start + i if USE_ID_STARTS else i + 1
         building = {
-            'id': i + 1,
+            **_generate_metadata(id),
             'name': fake.company(),
-            'unit_count': random.randint(50, 500),
             'floor_count': random.randint(3, 20),
             'has_elevator': random.choice([True, False]),
             'has_pool': random.choice([True, False]),
@@ -110,19 +153,20 @@ def generate_buildings(count=count_per_table):
     return buildings
 
 # Generate Units (FK -> Building)
-def generate_units(count=count_per_table):
+def generate_units(count=units_per_table):
     global total_generated
     global unit_ids
     units = []
     for i in range(count):
+        id = unit_id_start + i if USE_ID_STARTS else i + 1
         unit = {
-            'id': i + 1,
+            **_generate_metadata(id),
             'unit_number': random.randint(100, 999),
             'floor_number': random.randint(1, 20),
             'bedrooms': random.randint(1, 5),
             'bathrooms': random.choice([1.0, 1.5, 2.0, 2.5, 3.0]),
             'sqft': random.randint(500, 2000),
-            'is_vacant': random.choice([True, False]),
+            'is_vacant': True if random.random() < 0.4 else False,  # ~60% are occupied
             'building_id': random.choice(building_ids),
         }
         units.append(unit)
@@ -131,18 +175,20 @@ def generate_units(count=count_per_table):
     return units
 
 # Generate Leases (FK -> Unit)
-def generate_leases(count=count_per_table):
+def generate_leases(count=leases_per_table):
     global total_generated
     global lease_ids
     leases = []
     for i in range(count):
-        start = fake.date_between(start_date='-1y', end_date='today')
-        end = start + relativedelta(years=1)
+        id = lease_id_start + i if USE_ID_STARTS else i + 1
+        start = fake.date_between(start_date='-540d', end_date='today')  # Have some expired leases
+        end = start + relativedelta(years=1)  # 1-year lease
         lease = {
-            'id': i + 1,
+            **_generate_metadata(id),
             'start_date': start,
             'end_date': end,
             'rent': random.randint(1000, 5000),
+            'deposit': random.randint(1000, 5000),
             'unit_id': random.choice(unit_ids)
         }
         leases.append(lease)
@@ -151,15 +197,16 @@ def generate_leases(count=count_per_table):
     return leases
 
 # Generate Tenants (FK -> Lease)
-def generate_tenants(count=count_per_table):
+def generate_tenants(count=tenants_per_table):
     global total_generated
     global tenant_ids
     tenants = []
     for i in range(count):
+        id = tenant_id_start + i if USE_ID_STARTS else i + 1
         tenant = {
-            'id': i + 1,
+            **_generate_metadata(id),
             'name': fake.name(),
-            'email': f'tenant{i+1}@example.com',
+            'email': f'tenant{id}@example.com',
             'phone': fake.phone_number(),
             'lease_id': random.choice(lease_ids)
         }
@@ -169,15 +216,22 @@ def generate_tenants(count=count_per_table):
     return tenants
 
 # Generate Insurances (FK -> Tenant)
-def generate_insurances(count=count_per_table):
+def generate_insurances(count=insurances_per_table):
     global total_generated
     global insurance_ids
     insurances = []
     for i in range(count):
+        id = insurance_id_start + i if USE_ID_STARTS else i + 1
+        effective = fake.date_this_decade()  # Random effective date
+        expiration = effective + relativedelta(years=3)  # 3-year policy
         insurance = {
-            'id': i + 1,
+            **_generate_metadata(id),
+            'provider': fake.company(),
+            'policy_type': random.choice(['Renters', 'Homeowners', 'Condo']),
             'policy_number': fake.uuid4(),
-            'expiration_date': fake.date_this_decade(),
+            'premium': random.randint(100, 500),
+            'effective_date': effective,
+            'expiration_date': expiration,
             'tenant_id': random.choice(tenant_ids)
         }
         insurances.append(insurance)
@@ -209,12 +263,21 @@ def custom_serializer(obj):
 
 # Save to JSON
 mock_data = generate_mock_data()
-suffix = int(datetime.now().strftime('%Y%m%d'))
-filename = f'mockdata_{suffix}.json'
 with open(filename, 'w') as f:
     json.dump(mock_data, f, indent=4, default=custom_serializer)
 
-print('Mock data generated successfully!')
-print(f'Mocked {count_per_table} records in {len(mock_data)} tables.')
-print(f'Total records generated: {total_generated}')
+print('=' * 50)
+print('Data generated successfully!'.center(50))
+print('=' * 50)
+print(f'Mocked {total_generated} records in {len(mock_data)} tables.')
+print('-' * 50)
+print(f'Users: {users_per_table}')
+print(f'Properties: {properties_per_table}')
+print(f'Buildings: {buildings_per_table}')
+print(f'Units: {units_per_table}')
+print(f'Leases: {leases_per_table}')
+print(f'Tenants: {tenants_per_table}')
+print(f'Insurances: {insurances_per_table}')
+print('=' * 50)
 print(f'Filename: {filename}')
+print('=' * 50)
