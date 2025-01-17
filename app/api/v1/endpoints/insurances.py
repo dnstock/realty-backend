@@ -17,14 +17,14 @@ def create(
     context: RequestContext = Depends(get_request_context),
 ):
     validate_ownership(context=context, model_name='Tenant', resource_id=tenant_id)
-    return InsuranceController.create_and_commit(db=context.db, schema=insurance, parent_id=tenant_id)
+    return InsuranceController.create_and_commit(context=context, schema=insurance, parent_id=tenant_id)
 
 @router.get('/', response_model=PaginatedResults)
 def index(
     skip: int = 0, limit: int = 10,
     context: RequestContext = Depends(get_request_context),
 ):
-    results = InsuranceController.get_all(db=context.db, skip=skip, limit=limit)
+    results = InsuranceController.get_all(context=context, skip=skip, limit=limit)
     return serialize_results(results, InsuranceSchema.Read)
 
 @router.get('/{insurance_id}', response_model=InsuranceSchema.Read)
@@ -33,7 +33,7 @@ def read(
     context: RequestContext = Depends(get_request_context),
 ):
     validate_ownership(context=context, model_name='Insurance', resource_id=insurance_id)
-    return InsuranceController.get_by_id(db=context.db, id=insurance_id)
+    return InsuranceController.get_by_id(context=context, id=insurance_id)
 
 @router.put('/{insurance_id}', response_model=InsuranceSchema.Read)
 def update(
@@ -41,4 +41,4 @@ def update(
     context: RequestContext = Depends(get_request_context),
 ):
     validate_ownership(context=context, model_name='Insurance', resource_id=insurance_id)
-    return InsuranceController.update_and_commit(db=context.db, schema=insurance, id=insurance_id)
+    return InsuranceController.update_and_commit(context=context, schema=insurance, id=insurance_id)

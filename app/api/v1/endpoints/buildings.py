@@ -17,14 +17,14 @@ def create(
     context: RequestContext = Depends(get_request_context),
 ):
     validate_ownership(context=context, model_name='Property', resource_id=property_id)
-    return BuildingController.create_and_commit(db=context.db, schema=building, parent_id=property_id)
+    return BuildingController.create_and_commit(context=context, schema=building, parent_id=property_id)
 
 @router.get('/', response_model=PaginatedResults)
 def index(
     skip: int = 0, limit: int = 10,
     context: RequestContext = Depends(get_request_context),
 ):
-    results = BuildingController.get_all(db=context.db, skip=skip, limit=limit)
+    results = BuildingController.get_all(context=context, skip=skip, limit=limit)
     return serialize_results(results, BuildingSchema.Read)
 
 @router.get('/{building_id}', response_model=BuildingSchema.Read)
@@ -33,7 +33,7 @@ def read(
     context: RequestContext = Depends(get_request_context),
 ):
     validate_ownership(context=context, model_name='Building', resource_id=building_id)
-    return BuildingController.get_by_id(db=context.db, id=building_id)
+    return BuildingController.get_by_id(context=context, id=building_id)
 
 @router.put('/{building_id}', response_model=BuildingSchema.Read)
 def update(
@@ -41,7 +41,7 @@ def update(
     context: RequestContext = Depends(get_request_context),
 ):
     validate_ownership(context=context, model_name='Building', resource_id=building_id)
-    return BuildingController.update_and_commit(db=context.db, schema=building, id=building_id)
+    return BuildingController.update_and_commit(context=context, schema=building, id=building_id)
 
 @router.get('/{building_id}/units/', response_model=PaginatedResults)
 def subindex(
@@ -49,5 +49,5 @@ def subindex(
     context: RequestContext = Depends(get_request_context),
 ):
     validate_ownership(context=context, model_name='Building', resource_id=building_id)
-    results = UnitController.get_all_from_parent(db=context.db, parent_id=building_id, skip=skip, limit=limit)
+    results = UnitController.get_all_from_parent(context=context, parent_id=building_id, skip=skip, limit=limit)
     return serialize_results(results, UnitSchema.Read)
