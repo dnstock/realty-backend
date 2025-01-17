@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel as PydanticBaseModel, ConfigDict, Field
+from pydantic import BaseModel as PydanticBaseModel, ConfigDict
 from typing import TypeVar
 
 class BaseModelConfig(PydanticBaseModel):
@@ -18,9 +18,6 @@ class BaseModel(BaseModelConfig):
     is_flagged: bool = False
     created_at: datetime | None = None
     updated_at: datetime | None = None
-
-class ResourceBaseModel(BaseModel):
-    resource_info: dict[str, str | None] = Field(default_factory=dict)
 
 # Generic type for base schemas (e.g. Create schemas)
 T = TypeVar('T', infer_variance=True, bound=BaseModel)

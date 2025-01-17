@@ -1,6 +1,6 @@
 # User -> Property -> Building -> Unit -> Lease -> Tenant -> Insurance
 from . import (
-    base as BaseSchema,
+    resource,
     request as RequestSchema,
     user as UserSchema,
     property as PropertySchema,
@@ -12,7 +12,6 @@ from . import (
 )
 
 __all__ = [
-    'BaseSchema',
     'RequestSchema',
     'UserSchema',
     'BuildingSchema',
@@ -24,6 +23,7 @@ __all__ = [
 ]
 
 # Resolve forward references (while avoiding circular imports)
+resource.BaseResourceModel.model_rebuild()
 PropertySchema.ReadFull.model_rebuild()
 BuildingSchema.ReadFull.model_rebuild()
 UnitSchema.ReadFull.model_rebuild()

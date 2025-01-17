@@ -1,11 +1,11 @@
 from datetime import date
 from typing import TYPE_CHECKING
-from .base import ResourceBaseModel
+from .resource import BaseResourceModel
 from .utils.partial_models import make_partial_model
 if TYPE_CHECKING:
     from schemas import TenantSchema
 
-class Base(ResourceBaseModel):
+class Base(BaseResourceModel):
     provider: str | None = None
     policy_type: str | None = None
     policy_number: str

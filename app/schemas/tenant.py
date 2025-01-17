@@ -1,11 +1,11 @@
 from pydantic import EmailStr, Field
 from typing import TYPE_CHECKING
-from .base import ResourceBaseModel
+from .resource import BaseResourceModel
 from .utils.partial_models import make_partial_model
 if TYPE_CHECKING:
     from schemas import LeaseSchema, InsuranceSchema
 
-class Base(ResourceBaseModel):
+class Base(BaseResourceModel):
     name: str
     email: EmailStr | None = None
     phone: str | None = None
