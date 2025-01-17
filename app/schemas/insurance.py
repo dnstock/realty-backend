@@ -7,6 +7,7 @@ if TYPE_CHECKING:
 
 class Base(ResourceBaseModel):
     provider: str | None = None
+    policy_type: str | None = None
     policy_number: str
     premium: float | None = None
     effective_date: date | None = None
