@@ -1,11 +1,11 @@
 from pydantic import Field, constr, field_validator
 from typing import TYPE_CHECKING, Annotated, Literal
-from .base import BaseModel
+from .base import ResourceBaseModel
 from .utils.partial_models import make_partial_model
 if TYPE_CHECKING:
     from schemas import BuildingSchema
 
-class Base(BaseModel):
+class Base(ResourceBaseModel):
     name: str
     address: str
     city: str

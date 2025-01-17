@@ -19,6 +19,7 @@ class BaseModel(BaseModelConfig):
     created_at: datetime | None = None
     updated_at: datetime | None = None
 
+class ResourceBaseModel(BaseModel):
     resource_info: dict[str, str | None] = Field(default_factory=dict)
 
 # Generic type for base schemas (e.g. Create schemas)

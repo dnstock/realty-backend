@@ -1,11 +1,11 @@
 from pydantic import Field, StrictInt
 from typing import TYPE_CHECKING, Annotated
-from .base import BaseModel
+from .base import ResourceBaseModel
 from .utils.partial_models import make_partial_model
 if TYPE_CHECKING:
     from schemas import PropertySchema, UnitSchema
 
-class Base(BaseModel):
+class Base(ResourceBaseModel):
     name: str
     unit_count: Annotated[StrictInt, Field(gt=0)]
     floor_count: Annotated[StrictInt, Field(gt=0)]
