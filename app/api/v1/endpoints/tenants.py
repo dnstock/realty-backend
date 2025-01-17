@@ -11,8 +11,24 @@ from schemas import TenantSchema, InsuranceSchema
 
 router: APIRouter = APIRouter()
 
+@router.post('/', response_model=TenantSchema.Read)
+def create(
+    lease_id: int, tenant: TenantSchema.Create,
+    context: RequestContext = Depends(get_request_context),
+):
+    validate_ownership(context=context, model_name='Lease', resource_id=lease_id)
+    return TenantController.create_and_commit(db=context.db, schema=tenant, parent_id=lease_id)
+
+@router.get('/', response_model=PaginatedResults)
+def index(
+    skip: int = 0, limit: int = 10,
+    context: RequestContext = Depends(get_request_context),
+):
+    results = TenantController.get_all(db=context.db, skip=skip, limit=limit)
+    return serialize_results(results, TenantSchema.Read)
+
 @router.get('/{tenant_id}', response_model=TenantSchema.Read)
-def read_tenant(
+def read(
     tenant_id: int,
     context: RequestContext = Depends(get_request_context),
 ):
@@ -20,26 +36,18 @@ def read_tenant(
     return TenantController.get_by_id(db=context.db, id=tenant_id)
 
 @router.put('/{tenant_id}', response_model=TenantSchema.Read)
-def update_tenant(
+def update(
     tenant_id: int, tenant: TenantSchema.Update,
     context: RequestContext = Depends(get_request_context),
 ):
     validate_ownership(context=context, model_name='Tenant', resource_id=tenant_id)
     return TenantController.update_and_commit(db=context.db, schema=tenant, id=tenant_id)
 
-@router.post('/{tenant_id}/insurances/', response_model=InsuranceSchema.Read)
-def create_insurance(
-    tenant_id: int, insurance: InsuranceSchema.Create,
-    context: RequestContext = Depends(get_request_context),
-):
-    validate_ownership(context=context, model_name='Tenant', resource_id=tenant_id)
-    return InsuranceController.create_and_commit(db=context.db, schema=insurance, parent_id=tenant_id)
-
 @router.get('/{tenant_id}/insurances/', response_model=PaginatedResults)
-def read_insurances(
+def subindex(
     tenant_id: int, skip: int = 0, limit: int = 10,
     context: RequestContext = Depends(get_request_context),
 ):
     validate_ownership(context=context, model_name='Tenant', resource_id=tenant_id)
-    results = InsuranceController.get_all_paginated(db=context.db, parent_id=tenant_id, skip=skip, limit=limit)
+    results = InsuranceController.get_all_from_parent(db=context.db, parent_id=tenant_id, skip=skip, limit=limit)
     return serialize_results(results, InsuranceSchema.Read)

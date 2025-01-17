@@ -28,13 +28,19 @@ def get_by(db: Session, model: Type[T], key: str, val: Any) -> T | None:
 def get_by_id(db: Session, model: Type[T], id: int) -> T | None:
     return get_by(db=db, model=model, key='id', val=id)
 
-def get_all(db: Session, model: Type[T], parent_key: str, parent_value: int) -> AllResults:
+def get_all_unpaginated(db: Session, model: Type[T], parent_key: str, parent_value: int) -> AllResults:
     query = db.query(model).filter(getattr(model, parent_key) == parent_value)
     rowCount = query.count()
     rows = query.all()
     return AllResults(rows=rows, rowCount=rowCount)
 
-def get_all_paginated(db: Session, model: Type[T], parent_key: str, parent_value: int, skip: int = 0, limit: int = 10) -> PaginatedResults:
+def get_all(db: Session, model: Type[T], skip: int = 0, limit: int = 10) -> PaginatedResults:
+    query = db.query(model)
+    rowCount = query.count()
+    rows = query.offset(skip).limit(limit).all()
+    return PaginatedResults(rows=rows, rowCount=rowCount, pageStart=min(skip, rowCount), pageEnd=min(skip + limit, rowCount))
+
+def get_all_from_parent(db: Session, model: Type[T], parent_key: str, parent_value: int, skip: int = 0, limit: int = 10) -> PaginatedResults:
     query = db.query(model).filter(getattr(model, parent_key) == parent_value)
     rowCount = query.count()
     rows = query.offset(skip).limit(limit).all()

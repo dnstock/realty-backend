@@ -11,8 +11,24 @@ from schemas import UnitSchema, LeaseSchema
 
 router: APIRouter = APIRouter()
 
+@router.post('/', response_model=UnitSchema.Read)
+def create(
+    building_id: int, unit: UnitSchema.Create,
+    context: RequestContext = Depends(get_request_context),
+):
+    validate_ownership(context=context, model_name='Building', resource_id=building_id)
+    return UnitController.create_and_commit(db=context.db, schema=unit, parent_id=building_id)
+
+@router.get('/', response_model=PaginatedResults)
+def index(
+    skip: int = 0, limit: int = 10,
+    context: RequestContext = Depends(get_request_context),
+):
+    results = UnitController.get_all(db=context.db, skip=skip, limit=limit)
+    return serialize_results(results, UnitSchema.Read)
+
 @router.get('/{unit_id}', response_model=UnitSchema.Read)
-def read_unit(
+def read(
     unit_id: int,
     context: RequestContext = Depends(get_request_context),
 ):
@@ -20,26 +36,18 @@ def read_unit(
     return UnitController.get_by_id(db=context.db, id=unit_id)
 
 @router.put('/{unit_id}', response_model=UnitSchema.Read)
-def update_unit(
+def update(
     unit_id: int, unit: UnitSchema.Update,
     context: RequestContext = Depends(get_request_context),
 ):
     validate_ownership(context=context, model_name='Unit', resource_id=unit_id)
     return UnitController.update_and_commit(db=context.db, schema=unit, id=unit_id)
 
-@router.post('/{unit_id}/leases/', response_model=LeaseSchema.Read)
-def create_lease(
-    unit_id: int, lease: LeaseSchema.Create,
-    context: RequestContext = Depends(get_request_context),
-):
-    validate_ownership(context=context, model_name='Unit', resource_id=unit_id)
-    return LeaseController.create_and_commit(db=context.db, schema=lease, parent_id=unit_id)
-
 @router.get('/{unit_id}/leases/', response_model=PaginatedResults)
-def read_leases(
+def subindex(
     unit_id: int, skip: int = 0, limit: int = 10,
     context: RequestContext = Depends(get_request_context),
 ):
     validate_ownership(context=context, model_name='Unit', resource_id=unit_id)
-    results = LeaseController.get_all_paginated(db=context.db, parent_id=unit_id, skip=skip, limit=limit)
+    results = LeaseController.get_all_from_parent(db=context.db, parent_id=unit_id, skip=skip, limit=limit)
     return serialize_results(results, LeaseSchema.Read)
