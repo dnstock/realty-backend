@@ -7,7 +7,6 @@ if TYPE_CHECKING:
 
 class Base(ResourceBaseModel):
     name: str
-    unit_count: Annotated[StrictInt, Field(gt=0)]
     floor_count: Annotated[StrictInt, Field(gt=0)]
     has_elevator: bool = False
     has_pool: bool = False
@@ -24,6 +23,7 @@ class Update(make_partial_model(Base)):
 
 class Read(Base):
     property: 'PropertySchema.Read'
+    unit_count: int
 
 class ReadFull(Read):
     units: list['UnitSchema.Read'] = Field(default_factory=list)

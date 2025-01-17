@@ -1,5 +1,6 @@
 from sqlalchemy import Integer, String, ForeignKey, Boolean
 from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy.ext.hybrid import hybrid_property
 from typing import TYPE_CHECKING
 from db import ResourceBase
 if TYPE_CHECKING:
@@ -21,3 +22,7 @@ class Building(ResourceBase):
 
     property: Mapped['Property'] = relationship('Property', back_populates='buildings')
     units: Mapped[list['Unit']] = relationship('Unit', back_populates='building')
+
+    @hybrid_property
+    def unit_count(self) -> int:
+        return len(self.units)
