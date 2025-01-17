@@ -10,6 +10,7 @@ class Base(ResourceBaseModel):
     start_date: date
     end_date: date
     rent: float
+    deposit: float | None = None
     unit_id: int
 
 class Create(Base):
