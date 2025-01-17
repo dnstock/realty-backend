@@ -10,7 +10,7 @@ class Building(ResourceBase):
     _resource_parent = 'property'
     _resource_child = 'unit'
 
-    name: Mapped[str] = mapped_column(String, index=True)
+    name: Mapped[str] = mapped_column(String)
     unit_count: Mapped[int] = mapped_column(Integer)
     floor_count: Mapped[int] = mapped_column(Integer)
     has_elevator: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default='false')

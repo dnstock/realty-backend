@@ -1,7 +1,6 @@
 from fastapi import FastAPI
-from core import settings
+from core import settings, utils
 from api import api_router, register_middleware, register_error_handlers
-from core import utils
 import platform
 
 app = FastAPI()

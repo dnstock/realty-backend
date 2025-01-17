@@ -9,11 +9,11 @@ class Property(ResourceBase):
     __tablename__ = 'properties'
     _resource_child = 'building'
 
-    name: Mapped[str] = mapped_column(String, index=True)
-    address: Mapped[str] = mapped_column(String, index=True)
-    city: Mapped[str] = mapped_column(String, index=True)
-    state: Mapped[str] = mapped_column(String, index=True)
-    zip_code: Mapped[str] = mapped_column(String, index=True)
+    name: Mapped[str] = mapped_column(String)
+    address: Mapped[str] = mapped_column(String)
+    city: Mapped[str] = mapped_column(String)
+    state: Mapped[str] = mapped_column(String)
+    zip_code: Mapped[str] = mapped_column(String)
     type: Mapped[str] = mapped_column(String, index=True)
     manager: Mapped[str] = mapped_column(String, nullable=True)
 

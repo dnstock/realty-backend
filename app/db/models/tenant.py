@@ -10,9 +10,9 @@ class Tenant(ResourceBase):
     _resource_parent = 'lease'
     _resource_child = 'insurance'
 
-    name: Mapped[str] = mapped_column(String, index=True)
-    email: Mapped[str] = mapped_column(String, index=True, unique=True)
-    phone: Mapped[str] = mapped_column(String, index=True)
+    name: Mapped[str] = mapped_column(String)
+    email: Mapped[str] = mapped_column(String)
+    phone: Mapped[str] = mapped_column(String)
     lease_id: Mapped[int] = mapped_column(ForeignKey('leases.id'), index=True, nullable=False)
 
     lease: Mapped['Lease'] = relationship('Lease', back_populates='tenants')

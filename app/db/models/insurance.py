@@ -9,7 +9,7 @@ class Insurance(ResourceBase):
     __tablename__ = 'insurances'
     _resource_parent = 'tenant'
 
-    policy_number: Mapped[str] = mapped_column(String, index=True)
+    policy_number: Mapped[str] = mapped_column(String)
     expiration_date: Mapped[Date] = mapped_column(Date)
     tenant_id: Mapped[int] = mapped_column(ForeignKey('tenants.id'), index=True, nullable=False)
 
