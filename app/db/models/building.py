@@ -20,7 +20,7 @@ class Building(ResourceBase):
     has_doorman: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default='false')
     property_id: Mapped[int] = mapped_column(ForeignKey('properties.id'), index=True, nullable=False)
 
-    property: Mapped['Property'] = relationship('Property', back_populates='buildings')
+    prop: Mapped['Property'] = relationship('Property', back_populates='buildings')  # Can't use 'property' as a variable name
     units: Mapped[list['Unit']] = relationship('Unit', back_populates='building')
 
     @hybrid_property
@@ -35,7 +35,7 @@ class Building(ResourceBase):
     def vacancy_rate(self) -> float:
         return self.vacant_units / self.unit_count if self.unit_count else 0.0
 
-    @hybrid_property
+    @property
     def vacancy(self) -> dict[str, float | int]:
         return {
             'count': self.vacant_units,
@@ -50,7 +50,7 @@ class Building(ResourceBase):
     def occupancy_rate(self) -> float:
         return self.occupied_units / self.unit_count if self.unit_count else 0.0
 
-    @hybrid_property
+    @property
     def occupancy(self) -> dict[str, float | int]:
         return {
             'count': self.occupied_units,
