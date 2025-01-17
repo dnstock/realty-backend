@@ -40,10 +40,10 @@ def get_all_paginated(db: Session, model: Type[T], parent_key: str, parent_value
     rows = query.offset(skip).limit(limit).all()
     return PaginatedResults(rows=rows, rowCount=rowCount, pageStart=min(skip, rowCount), pageEnd=min(skip + limit, rowCount))
 
-def create_and_commit(db: Session, model: Type[T], schema: BaseModel, parent_key: str, parent_value: int) -> T | None:
+def create_and_commit(db: Session, model: Type[T], schema: BaseModel, parent_key: str | None, parent_value: int | None) -> T | None:
     try:
         db_obj = model(**schema.model_dump(exclude_unset=True))
-        setattr(db_obj, parent_key, parent_value)
+        setattr(db_obj, parent_key, parent_value) if parent_key else None
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)

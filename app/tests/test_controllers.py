@@ -73,7 +73,7 @@ schema_property_create = PropertySchema.Create(
     state='IL',
     zip_code='62701',
     type='residential',
-    manager_id=1,
+    manager='John Doe',
 )
 schema_building_create = BuildingSchema.Create(
     name='Building 1',
@@ -290,7 +290,7 @@ def test_update_property(test_db: Session, test_property: PropertySchema.Create)
         state='IL',
         zip_code='62701',
         type='commercial',
-        manager_id=1,
+        manager='Jane Doe',
     )
     updated_property = PropertyController.update_and_commit(
         db=test_db,
@@ -301,6 +301,7 @@ def test_update_property(test_db: Session, test_property: PropertySchema.Create)
     assert updated_property.name == 'Property 2'
     assert updated_property.address == '456 Elm St'
     assert updated_property.type == 'commercial'
+    assert updated_property.manager == 'Jane Doe'
 
 def test_get_property(test_db: Session):
     property = PropertyController.get_by_id(db=test_db, id=1)

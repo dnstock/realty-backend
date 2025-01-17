@@ -16,7 +16,7 @@ def create_property(
     property: PropertySchema.Create,
     context: RequestContext = Depends(get_request_context),
 ):
-    return PropertyController.create_and_commit(db=context.db, schema=property, parent_id=context.get_user_id())
+    return PropertyController.create_and_commit(db=context.db, schema=property)
 
 @router.get('/', response_model=PaginatedResults)
 def read_properties(

@@ -39,7 +39,7 @@ property0 = {
     'state': 'NJ',
     'zip_code': '07601',
     'type': 'Commercial',
-    'manager_id': 1
+    'manager': 'Dan Hart'
 }
 
 # Generate Users
@@ -79,7 +79,7 @@ def generate_properties(count=count_per_table):
                 'state': fake.state_abbr(),
                 'zip_code': fake.zipcode(),
                 'type': random.choice(['Commercial', 'Residential']),
-                'manager_id': random.choice(user_ids)
+                'manager': fake.name(),
             }
         properties.append(property_)
         property_ids.append(property_['id'])

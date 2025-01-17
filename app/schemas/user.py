@@ -1,10 +1,8 @@
 from pydantic import EmailStr, Field, field_validator
-from typing import TYPE_CHECKING, Annotated
+from typing import Annotated
 from core import security
 from .base import BaseModel
 from .utils.partial_models import make_partial_model
-if TYPE_CHECKING:
-    from schemas import PropertySchema
 
 class Base(BaseModel):
     name: str
@@ -23,6 +21,3 @@ class Update(make_partial_model(Base)):
 
 class Read(Base):
     password: Annotated[str, Field(exclude=True)]
-
-class ReadFull(Read):
-    properties: list['PropertySchema.Read'] = Field(default_factory=list)

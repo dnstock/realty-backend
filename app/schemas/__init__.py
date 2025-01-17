@@ -24,7 +24,6 @@ __all__ = [
 ]
 
 # Resolve forward references (while avoiding circular imports)
-UserSchema.ReadFull.model_rebuild()
 PropertySchema.ReadFull.model_rebuild()
 BuildingSchema.ReadFull.model_rebuild()
 UnitSchema.ReadFull.model_rebuild()
