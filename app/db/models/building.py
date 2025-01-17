@@ -26,3 +26,49 @@ class Building(ResourceBase):
     @hybrid_property
     def unit_count(self) -> int:
         return len(self.units)
+
+    @hybrid_property
+    def vacant_units(self) -> int:
+        return self.unit_count - sum(1 for unit in self.units if not unit.is_vacant)
+
+    @hybrid_property
+    def vacancy_rate(self) -> float:
+        return self.vacant_units / self.unit_count if self.unit_count else 0.0
+
+    @hybrid_property
+    def vacancy(self) -> dict[str, float | int]:
+        return {
+            'count': self.vacant_units,
+            'rate': self.vacancy_rate,
+        }
+
+    @hybrid_property
+    def occupied_units(self) -> int:
+        return self.unit_count - self.vacant_units
+
+    @hybrid_property
+    def occupancy_rate(self) -> float:
+        return self.occupied_units / self.unit_count if self.unit_count else 0.0
+
+    @hybrid_property
+    def occupancy(self) -> dict[str, float | int]:
+        return {
+            'count': self.occupied_units,
+            'rate': self.occupancy_rate,
+        }
+
+    @hybrid_property
+    def average_sqft(self) -> float:
+        return sum(unit.sqft for unit in self.units) / self.unit_count if self.unit_count else 0.0
+
+    @hybrid_property
+    def average_bedrooms(self) -> float:
+        return sum(unit.bedrooms for unit in self.units) / self.unit_count if self.unit_count else 0.0
+
+    @hybrid_property
+    def average_bathrooms(self) -> float:
+        return sum(unit.bathrooms for unit in self.units) / self.unit_count if self.unit_count else 0.0
+
+    @hybrid_property
+    def average_rent(self) -> float:
+        return sum(lease.rent for unit in self.units for lease in unit.leases) / self.unit_count if self.unit_count else 0.0
