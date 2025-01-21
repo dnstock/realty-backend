@@ -1,5 +1,6 @@
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship, declared_attr
+from functools import cached_property
 from .base import Base
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -18,11 +19,11 @@ class ResourceBase(Base):
     _resource_parent: str | None = None
     _resource_child: str | None = None
 
-    @property
+    @cached_property
     def _resource(self) -> str:
         return self.__class__.__module__.lower().split('.')[-1]
 
-    @property
+    @cached_property
     def resource_info(self) -> dict[str, str | None]:
         return {
             'name': self._resource,
