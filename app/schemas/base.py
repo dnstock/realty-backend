@@ -21,11 +21,3 @@ class BaseModel(BaseModelConfig):
 
 # Generic type for base schemas (e.g. Create schemas)
 T = TypeVar('T', infer_variance=True, bound=BaseModel)
-
-
-
-
-
-
-
-

@@ -1,6 +1,6 @@
 from pydantic import ConfigDict, BaseModel as PydanticBaseModel
 from sqlalchemy.orm import Session
-from typing import TYPE_CHECKING, Any, List
+from typing import TYPE_CHECKING, Any, Sequence
 from .base import BaseModelConfig
 if TYPE_CHECKING:
     from schemas import UserSchema
@@ -23,7 +23,7 @@ class RequestContext(PydanticBaseModel):
     )
 
 class AllResults(BaseModelConfig):
-    rows: List[Any]
+    rows: Sequence[Any]
     rowCount: int
 
 class PaginatedResults(AllResults):
