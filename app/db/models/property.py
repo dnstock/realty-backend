@@ -17,4 +17,8 @@ class Property(ResourceBase):
     type: Mapped[str] = mapped_column(String, index=True)
     manager: Mapped[str] = mapped_column(String, nullable=True)
 
-    buildings: Mapped[list['Building']] = relationship('Building', back_populates='property')
+    buildings: Mapped[list['Building']] = relationship(
+        'Building',
+        back_populates='property',
+        lazy='dynamic',
+    )

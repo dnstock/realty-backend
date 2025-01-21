@@ -14,7 +14,10 @@ class ResourceBase(Base):
 
     @declared_attr
     def owner(cls) -> Mapped['User']:
-        return relationship('User')
+        return relationship(
+            'User',
+            lazy='dynamic',
+        )
 
     _resource_parent: str | None = None
     _resource_child: str | None = None

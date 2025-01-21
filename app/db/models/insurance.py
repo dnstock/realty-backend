@@ -17,4 +17,8 @@ class Insurance(ResourceBase):
     expiration_date: Mapped[Date] = mapped_column(Date)
     tenant_id: Mapped[int] = mapped_column(ForeignKey('tenants.id'), index=True, nullable=False)
 
-    tenant: Mapped['Tenant'] = relationship('Tenant', back_populates='insurances')
+    tenant: Mapped['Tenant'] = relationship(
+        'Tenant',
+        back_populates='insurances',
+        lazy='dynamic',
+    )

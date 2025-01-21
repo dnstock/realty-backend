@@ -15,5 +15,13 @@ class Tenant(ResourceBase):
     phone: Mapped[str] = mapped_column(String)
     lease_id: Mapped[int] = mapped_column(ForeignKey('leases.id'), index=True, nullable=False)
 
-    lease: Mapped['Lease'] = relationship('Lease', back_populates='tenants')
-    insurances: Mapped[list['Insurance']] = relationship('Insurance', back_populates='tenant')
+    lease: Mapped['Lease'] = relationship(
+        'Lease',
+        back_populates='tenants',
+        lazy='dynamic',
+    )
+    insurances: Mapped[list['Insurance']] = relationship(
+        'Insurance',
+        back_populates='tenant',
+        lazy='dynamic',
+    )

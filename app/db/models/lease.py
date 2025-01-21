@@ -16,5 +16,13 @@ class Lease(ResourceBase):
     deposit: Mapped[float] = mapped_column(Float, nullable=True)
     unit_id: Mapped[int] = mapped_column(ForeignKey('units.id'), index=True, nullable=False)
 
-    unit: Mapped['Unit'] = relationship('Unit', back_populates='leases')
-    tenants: Mapped[list['Tenant']] = relationship('Tenant', back_populates='lease')
+    unit: Mapped['Unit'] = relationship(
+        'Unit',
+        back_populates='leases',
+        lazy='dynamic',
+    )
+    tenants: Mapped[list['Tenant']] = relationship(
+        'Tenant',
+        back_populates='lease',
+        lazy='dynamic',
+    )
