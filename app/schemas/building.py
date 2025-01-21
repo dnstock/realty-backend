@@ -22,14 +22,12 @@ class Update(make_partial_model(Base)):
     pass
 
 class Read(Base):
-    property: 'PropertySchema.Read'
     unit_count: int
     vacancy: dict[str, float | int] = Field(default_factory=dict)  # count, rate
     occupancy: dict[str, float | int] = Field(default_factory=dict)  # count, rate
-    average_sqft: float
-    average_bedrooms: float
-    average_bathrooms: float
-    average_rent: float
+    average_stats: dict[str, float] = Field(default_factory=dict)  # sqft, bedrooms, bathrooms, rent
+
+    property: 'PropertySchema.Read'
 
 class ReadFull(Read):
     units: list['UnitSchema.Read'] = Field(default_factory=list)
