@@ -131,17 +131,16 @@ class Settings(BaseSettings):
     @classmethod
     def set_sqlalchemy_echo(cls, v: bool | None, info: ValidationInfo) -> bool:
         values = info.data
+        # Default to True in development
         if values['postgres_debug_log_queries'] is None:
-            # Default to True in development
             return values['app_env'] == 'development'
-        else:
-            # Set to value of environment variable, if defined
-            return values['postgres_debug_log_queries']
+        # Set to value of environment variable, if defined
+        return values['postgres_debug_log_queries']
 
     # Uppercase the log levels
     @field_validator('log_level', 'log_level_file', 'log_level_console', mode='before')
     @classmethod
-    def ensure_uppercase_log_levels(cls, v: str | None, info: ValidationInfo) -> str:
+    def uppercase_log_levels(cls, v: str | None, info: ValidationInfo) -> str:
         values = info.data
         return values['log_level'].upper() if v is None else v.upper()
 
