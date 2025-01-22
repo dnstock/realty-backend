@@ -1,6 +1,6 @@
 {
     "python.analysis.typeCheckingMode": "strict",
-    "python.analysis.autoImportCompletions": true,
+    "python.analysis.autoImportCompletions": false,
     "editor.tokenColorCustomizations": {
         "[Default Dark Modern]": {
             "textMateRules": [
@@ -24,5 +24,5 @@
     "github.copilot.enable": {
         "markdown": true,
         "scminput": true
-    }
+    },
 }
