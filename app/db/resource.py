@@ -5,9 +5,10 @@ from .base import Base
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from models import User
+from .mixins import CommonMixins
 
 # Base class for all resource tables in the database.
-class ResourceBase(Base):
+class ResourceBase(CommonMixins, Base):
     __abstract__ = True
 
     owner_id: Mapped[int] = mapped_column(ForeignKey('users.id'), index=True, nullable=False)
