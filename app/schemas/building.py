@@ -25,9 +25,11 @@ class Read(Base):
     unit_count: int
     vacancy: dict[str, float | int] = Field(default_factory=dict)  # count, rate
     occupancy: dict[str, float | int] = Field(default_factory=dict)  # count, rate
-    average_stats: dict[str, float] = Field(default_factory=dict)  # sqft, bedrooms, bathrooms, rent
 
     property: 'PropertySchema.Read'
+
+class ReadWithStats(Read):
+    average_stats: dict[str, float] = Field(default_factory=dict)  # sqft, bedrooms, bathrooms, rent
 
 class ReadFull(Read):
     units: list['UnitSchema.Read'] = Field(default_factory=list)

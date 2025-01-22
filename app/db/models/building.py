@@ -60,13 +60,14 @@ class Building(ResourceBase):
             return {'sqft': 0.0, 'bedrooms': 0.0, 'bathrooms': 0.0, 'rent': 0.0}
 
         active_units = [u for u in self.units if u.is_active]
-        if not active_units:
-            return {'sqft': 0.0, 'bedrooms': 0.0, 'bathrooms': 0.0, 'rent': 0.0}
-
-        unit_count = len(active_units)
         return {
-            'sqft': sum(u.sqft for u in active_units) / unit_count,
-            'bedrooms': sum(u.bedrooms for u in active_units) / unit_count,
-            'bathrooms': sum(u.bathrooms for u in active_units) / unit_count,
-            'rent': sum(l.rent for u in active_units for l in u.leases if l.is_active) / unit_count
+            'sqft': sum(u.sqft for u in self.units) / self.unit_count,
+            'bedrooms': sum(u.bedrooms for u in self.units) / self.unit_count,
+            'bathrooms': sum(u.bathrooms for u in self.units) / self.unit_count,
+            'rent': sum(
+                lease.rent
+                for u in active_units
+                for lease in u.leases
+                if lease.is_active
+            ) / len(active_units)
         }
