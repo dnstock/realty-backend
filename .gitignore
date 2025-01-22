@@ -56,14 +56,6 @@ MANIFEST
 # Jupyter Notebook
 .ipynb_checkpoints
 
-# pipenv
-Pipfile
-Pipfile.lock
-
-# poetry
-poetry.lock
-poetry.toml
-
 # Spyder project settings
 .spyderproject
 .spyproject
