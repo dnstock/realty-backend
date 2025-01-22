@@ -14,19 +14,31 @@ register_middleware(app)
 # Register API routes
 app.include_router(api_router, prefix='/api')
 
-app_info = [
-    ('Application Name', settings.app_name),
-    ('Environment', settings.app_env),
-    ('Debug Mode', str(settings.app_debug)),
-    ('Docked', str(settings.app_is_docked)),
-    ('Log Directory', f'./{settings.log_dir}/'),
-    ('Log Level', settings.log_level),
-    ('SQL Query Logging', str(settings.sqlalchemy_echo)),
-]
+def start_app() -> FastAPI:
+    # Optionally log important application info at startup:
+    app_info = [
+        ('Application Name', settings.app_name),
+        ('Environment', settings.app_env),
+        ('Debug Mode', str(settings.app_debug)),
+        ('Docked', str(settings.app_is_docked)),
+        ('Log Directory', f'./{settings.log_dir}/'),
+        ('Log Level', settings.log_level),
+        ('SQL Query Logging', str(settings.sqlalchemy_echo)),
+    ]
+    system_info = [
+        ('Python Version', platform.python_version()),
+    ]
+    utils.print_boxed_sections(app_info, system_info, title='Application Information')
+    return app
 
-system_info = [
-    ('Python Version', platform.python_version()),
-]
+# Initialize
+application = start_app()
 
-# Run when the application starts
-utils.print_boxed_sections(app_info, system_info, title='Application Information')
+if __name__ == '__main__':
+    import uvicorn
+    uvicorn.run(
+        'main:application',
+        host=settings.app_host,
+        port=settings.app_port,
+        reload=settings.app_env.lower() == 'development',
+    )
