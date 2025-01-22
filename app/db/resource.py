@@ -1,10 +1,7 @@
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship, declared_attr
+from sqlalchemy.orm import Mapped, mapped_column
 from functools import cached_property
 from .base import Base
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from models import User
 from .mixins import CommonMixins
 
 # Base class for all resource tables in the database.
@@ -12,13 +9,6 @@ class ResourceBase(CommonMixins, Base):
     __abstract__ = True
 
     owner_id: Mapped[int] = mapped_column(ForeignKey('users.id'), index=True, nullable=False)
-
-    @declared_attr
-    def owner(cls) -> Mapped['User']:
-        return relationship(
-            'User',
-            lazy='dynamic',
-        )
 
     _resource_parent: str | None = None
     _resource_child: str | None = None
