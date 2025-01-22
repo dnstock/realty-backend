@@ -23,12 +23,12 @@ class Building(ResourceBase):
     property: Mapped['Property'] = relationship(
         'Property',
         back_populates='buildings',
-        lazy='dynamic',
+        lazy='joined',
     )
     units: Mapped[list['Unit']] = relationship(
         'Unit',
         back_populates='building',
-        lazy='dynamic',
+        lazy='selectin',
     )
 
     @cached_property

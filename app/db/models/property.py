@@ -20,5 +20,5 @@ class Property(ResourceBase):
     buildings: Mapped[list['Building']] = relationship(
         'Building',
         back_populates='property',
-        lazy='dynamic',
+        lazy='subquery',
     )

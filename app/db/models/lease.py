@@ -19,10 +19,10 @@ class Lease(ResourceBase):
     unit: Mapped['Unit'] = relationship(
         'Unit',
         back_populates='leases',
-        lazy='dynamic',
+        lazy='joined',
     )
     tenants: Mapped[list['Tenant']] = relationship(
         'Tenant',
         back_populates='lease',
-        lazy='dynamic',
+        lazy='selectin',
     )

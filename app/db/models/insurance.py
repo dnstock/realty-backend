@@ -20,5 +20,5 @@ class Insurance(ResourceBase):
     tenant: Mapped['Tenant'] = relationship(
         'Tenant',
         back_populates='insurances',
-        lazy='dynamic',
+        lazy='joined',
     )
