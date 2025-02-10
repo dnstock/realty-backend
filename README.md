@@ -320,6 +320,77 @@ See the `envs/.env_template` file for all available configuration options.
 └── README.md                   # Project README
 ```
 
+## Contributing
+
+Contributions are welcome! 
+
+To contribute, please follow these steps:
+
+1. Fork the repository
+
+```sh
+gh repo fork dnstock/realty-backend
+```
+
+2. Create a new branch
+
+```sh
+git checkout -b feature/my-feature
+```
+
+3. Make your changes
+
+```sh
+git add .
+git commit -m "Add my feature"
+```
+
+4. Commit your changes to your fork
+
+```sh
+git push origin feature/my-feature
+```
+
+5. Create a pull request
+
+```sh
+gh pr create
+```
+
+6. Wait for review and approval
+
+```sh
+gh pr status
+```
+
+7. Make any requested changes
+
+```sh
+git add .
+git commit -m "Address review comments"
+git push origin feature/my-feature
+```
+
+8. Merge your changes
+
+```sh
+gh pr merge
+```
+
+9. Celebrate your contribution!
+
+```sh
+🎉
+```
+
+## Support
+
+For support, please contact the author.
+
+## Authors
+
+- [Dan Harcsztark (dnstock)](https://github.com/dnstock)
+
 ## License
 
-Private and Confidential. All rights reserved.
+This project is open source and available under the [MIT License](LICENSE).
