@@ -393,4 +393,4 @@ For support, please contact the author.
 
 ## License
 
-This project is open source and available under the [MIT License](LICENSE).
+This project is open source and available under the MIT License - see the [LICENSE](LICENSE) file for details.
