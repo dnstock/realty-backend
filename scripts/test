@@ -7,4 +7,29 @@
 #   ./test <test_name>
 #
 
-pytest app/tests/test_$1.py
+# If no argument is provided, show usage.
+if [ -z "$1" ]; then
+    echo -e "Usage:\n./test <test_name> [test_function]\n"
+    exit
+fi
+
+FILE="app/tests/test_$1.py"
+
+# If the test file does not exist, show an error.
+if [ ! -f "$FILE" ]; then
+    echo "Test file $FILE does not exist."
+    exit
+fi
+
+# If a second argument is provided, run the test with the provided argument.
+if [ -n "$2" ]; then
+    # If the test function does not exist, show an error.
+    if ! grep -q "def $2" $FILE; then
+        echo "Test function $2 does not exist in $FILE."
+        exit
+    fi
+    FILE="$FILE::$2"
+fi
+
+# Run the test.
+python $FILE
