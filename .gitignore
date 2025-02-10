@@ -1,9 +1,9 @@
 # Environments
 .env
 .env.*
-# Skip example .env files
-!.env.example
-!.env.*.example
+# Skip .env template files
+!.env_template
+!.env.*_template
 
 # Jetbrains
 .idea/
